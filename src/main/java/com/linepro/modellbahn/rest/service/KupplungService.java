@@ -1,6 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IKupplung;
 import com.linepro.modellbahn.model.impl.Kupplung;
-
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -47,7 +45,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.KUPPLUNG, description = "Kupplung maintenance")
 @Path(ApiPaths.KUPPLUNG)
-public class KupplungService extends AbstractNamedItemService<IKupplung> {
+public class KupplungService extends AbstractItemService<IKupplung,String> {
 
     public KupplungService() {
         super(Kupplung.class);

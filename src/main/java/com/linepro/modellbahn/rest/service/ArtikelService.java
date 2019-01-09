@@ -1,9 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.persistence.IDecoderPersister;
-import com.linepro.modellbahn.persistence.INamedItemPersister;
-import com.linepro.modellbahn.persistence.IProduktPersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,8 +32,10 @@ import com.linepro.modellbahn.model.IProdukt;
 import com.linepro.modellbahn.model.ISteuerung;
 import com.linepro.modellbahn.model.IWahrung;
 import com.linepro.modellbahn.model.impl.Artikel;
-
 import com.linepro.modellbahn.model.util.Status;
+import com.linepro.modellbahn.persistence.IPersister;
+import com.linepro.modellbahn.persistence.IProduktPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -53,7 +51,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.hibernate.annotations.Persister;
 
 /**
  * ArtikelService. CRUD service for Artikel
@@ -61,27 +58,27 @@ import org.hibernate.annotations.Persister;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.ARTIKEL, description = "Artikel maintenance")
+@Api(value = ApiNames.ARTIKEL)
 @Path(ApiPaths.ARTIKEL)
-public class ArtikelService extends AbstractItemService<IArtikel> {
+public class ArtikelService extends AbstractItemService<IArtikel, String> {
 
     protected final IProduktPersister produktPersister;
-    protected final INamedItemPersister<IWahrung> wahrungPersister;
-    protected final INamedItemPersister<ISteuerung> steuerungPersister;
-    protected final INamedItemPersister<IMotorTyp> motorTypPersister;
-    protected final INamedItemPersister<ILicht> lichtPersister;
-    protected final INamedItemPersister<IKupplung> kupplungPersister;
-    protected final IDecoderPersister decoderPersister;
+    protected final IPersister<IWahrung, String> wahrungPersister;
+    protected final IPersister<ISteuerung, String> steuerungPersister;
+    protected final IPersister<IMotorTyp, String> motorTypPersister;
+    protected final IPersister<ILicht, String> lichtPersister;
+    protected final IPersister<IKupplung, String> kupplungPersister;
+    protected final IPersister<IDecoder,String> decoderPersister;
 
     public ArtikelService() {
         super(Artikel.class);
         produktPersister = (IProduktPersister) StaticPersisterFactory.get().createPersister(IProdukt.class);
-        wahrungPersister = (INamedItemPersister<IWahrung>) StaticPersisterFactory.get().createPersister(IWahrung.class);
-        steuerungPersister = (INamedItemPersister<ISteuerung>) StaticPersisterFactory.get().createPersister(ISteuerung.class);
-        motorTypPersister = (INamedItemPersister<IMotorTyp>) StaticPersisterFactory.get().createPersister(ISteuerung.class);
-        lichtPersister = (INamedItemPersister<ILicht>) StaticPersisterFactory.get().createPersister(ILicht.class);
-        kupplungPersister = (INamedItemPersister<IKupplung>) StaticPersisterFactory.get().createPersister(IKupplung.class);
-        decoderPersister = (IDecoderPersister) StaticPersisterFactory.get().createPersister(IDecoder.class);
+        wahrungPersister = StaticPersisterFactory.get().createPersister(IWahrung.class);
+        steuerungPersister = StaticPersisterFactory.get().createPersister(ISteuerung.class);
+        motorTypPersister = StaticPersisterFactory.get().createPersister(ISteuerung.class);
+        lichtPersister = StaticPersisterFactory.get().createPersister(ILicht.class);
+        kupplungPersister = StaticPersisterFactory.get().createPersister(IKupplung.class);
+        decoderPersister = StaticPersisterFactory.get().createPersister(IDecoder.class);
     }
 
     @JsonCreator

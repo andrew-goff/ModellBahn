@@ -1,7 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.model.IHersteller;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.net.URL;
 
 import javax.ws.rs.Consumes;
@@ -20,6 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.linepro.modellbahn.model.IHersteller;
 import com.linepro.modellbahn.model.impl.Hersteller;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -37,9 +36,9 @@ import io.swagger.annotations.ApiOperation;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.HERSTELLER, description = "Hersteller maintenance")
+@Api(value = ApiNames.HERSTELLER)
 @Path(ApiPaths.HERSTELLER)
-public class HerstellerService extends AbstractNamedItemService<IHersteller> {
+public class HerstellerService extends AbstractItemService<IHersteller, String> {
 
     public HerstellerService() {
         super(Hersteller.class);

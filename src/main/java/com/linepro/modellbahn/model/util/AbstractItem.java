@@ -26,7 +26,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.linepro.modellbahn.model.IItem;
 import com.linepro.modellbahn.persistence.DBNames;
-import com.linepro.modellbahn.persistence.IKey;
 import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.util.ToStringBuilder;
 

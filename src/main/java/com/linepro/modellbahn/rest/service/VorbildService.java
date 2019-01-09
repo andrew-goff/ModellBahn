@@ -1,8 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.persistence.INamedItemPersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,8 +30,9 @@ import com.linepro.modellbahn.model.IGattung;
 import com.linepro.modellbahn.model.IUnterKategorie;
 import com.linepro.modellbahn.model.IVorbild;
 import com.linepro.modellbahn.model.impl.Vorbild;
-
 import com.linepro.modellbahn.model.util.LeistungsUbertragung;
+import com.linepro.modellbahn.persistence.IPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -55,22 +53,22 @@ import io.swagger.annotations.ApiOperation;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.VORBILD, description = "Vorbild maintenance")
+@Api(value = ApiNames.VORBILD)
 @Path(ApiPaths.VORBILD)
-public class VorbildService extends AbstractNamedItemService<IVorbild> {
+public class VorbildService extends AbstractItemService<IVorbild,String> {
 
-    protected final INamedItemPersister<IGattung> gattungPersister;
-    protected final INamedItemPersister<IBahnverwaltung> bahnverwaltungPersister;
-    protected final INamedItemPersister<IAntrieb> antriebPersister;
-    protected final INamedItemPersister<IAchsfolg> achsfolgPersister;
+    protected final IPersister<IGattung,String> gattungPersister;
+    protected final IPersister<IBahnverwaltung,String> bahnverwaltungPersister;
+    protected final IPersister<IAntrieb,String> antriebPersister;
+    protected final IPersister<IAchsfolg,String> achsfolgPersister;
 
     public VorbildService() {
         super(Vorbild.class);
 
-        gattungPersister = (INamedItemPersister<IGattung>) StaticPersisterFactory.get().createPersister(IGattung.class);
-        bahnverwaltungPersister = (INamedItemPersister<IBahnverwaltung>) StaticPersisterFactory.get().createPersister(IBahnverwaltung.class);
-        antriebPersister = (INamedItemPersister<IAntrieb>) StaticPersisterFactory.get().createPersister(IAntrieb.class);
-        achsfolgPersister = (INamedItemPersister<IAchsfolg>) StaticPersisterFactory.get().createPersister(IAchsfolg.class);
+        gattungPersister = StaticPersisterFactory.get().createPersister(IGattung.class);
+        bahnverwaltungPersister = StaticPersisterFactory.get().createPersister(IBahnverwaltung.class);
+        antriebPersister = StaticPersisterFactory.get().createPersister(IAntrieb.class);
+        achsfolgPersister = StaticPersisterFactory.get().createPersister(IAchsfolg.class);
 
     }
 
@@ -118,11 +116,11 @@ public class VorbildService extends AbstractNamedItemService<IVorbild> {
             @JsonProperty(value = ApiNames.DREHGESTELLBAUART) String drehgestellbauart,
             @JsonProperty(value = ApiNames.ANMERKUNG) String anmerkung,
             @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IGattung gattung = getGattungPersister().findByKey(gattungStr);
-        IBahnverwaltung bahnverwaltung = getGattungPersister().findByKey(bahnverwaltungStr);
-        IAntrieb antrieb = getAntriebPersister().findByKey(antriebStr);
-        IAchsfolg achsfolg = getAchsfolgPersister().findByKey(achsfolgStr);
+            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
+        IGattung gattung = getGattungPersister().findByKey(gattungStr, false);
+        IBahnverwaltung bahnverwaltung = getBahnverwaltungPersister().findByKey(bahnverwaltungStr, false);
+        IAntrieb antrieb = getAntriebPersister().findByKey(antriebStr, false);
+        IAchsfolg achsfolg = getAchsfolgPersister().findByKey(achsfolgStr, false);
 
         Vorbild entity = new Vorbild(id, gattung, unterKategorie, bahnverwaltung, hersteller, bauzeit, anzahl, betreibsNummer, antrieb, achsfolg, anmerkung, anfahrzugkraft, leistung, dienstgewicht,
                 geschwindigkeit, lange, ausserdienst, dmTreibrad, dmLaufradVorn, dmLaufradHinten, zylinder, dmZylinder, kolbenhub, kesselueberdruck, rostflaeche, ueberhitzerflaeche,
@@ -286,5 +284,21 @@ public class VorbildService extends AbstractNamedItemService<IVorbild> {
         }
 
         return getResponse(notFound());
+    }
+
+    protected IPersister<IGattung,String> getGattungPersister() {
+        return gattungPersister;
+    }
+
+    protected IPersister<IBahnverwaltung,String> getBahnverwaltungPersister() {
+        return bahnverwaltungPersister;
+    }
+
+    protected IPersister<IAntrieb,String> getAntriebPersister() {
+        return antriebPersister;
+    }
+
+    protected IPersister<IAchsfolg,String> getAchsfolgPersister() {
+        return achsfolgPersister;
     }
 }

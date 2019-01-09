@@ -1,6 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IAufbau;
 import com.linepro.modellbahn.model.impl.Aufbau;
-
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -47,9 +45,9 @@ import io.swagger.annotations.ApiResponses;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.AUFBAU, description = "Aufbau maintenance")
+@Api(value = ApiNames.AUFBAU)
 @Path(ApiPaths.AUFBAU)
-public class AufbauService extends AbstractNamedItemService<IAufbau> {
+public class AufbauService extends AbstractItemService<IAufbau, String> {
 
     public AufbauService() {
         super(Aufbau.class);

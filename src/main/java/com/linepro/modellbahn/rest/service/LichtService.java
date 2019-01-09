@@ -1,6 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.ILicht;
 import com.linepro.modellbahn.model.impl.Licht;
-
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -45,9 +43,9 @@ import io.swagger.annotations.ApiOperation;
  * @author  $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.LICHT, description = "Licht maintenance")
+@Api(value = ApiNames.LICHT)
 @Path(ApiPaths.LICHT)
-public class LichtService extends AbstractNamedItemService<ILicht> {
+public class LichtService extends AbstractItemService<ILicht,String> {
 
     public LichtService() {
         super(Licht.class);

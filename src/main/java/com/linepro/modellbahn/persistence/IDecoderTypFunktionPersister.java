@@ -1,11 +1,10 @@
 package com.linepro.modellbahn.persistence;
 
-import com.linepro.modellbahn.model.IDecoderTypFunktion;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.linepro.modellbahn.model.IItem;
+import com.linepro.modellbahn.model.IDecoderTypFunktion;
 import com.linepro.modellbahn.util.Selector;
 
 /**
@@ -14,7 +13,7 @@ import com.linepro.modellbahn.util.Selector;
  * @author   $Author$
  * @version  $Id$
  */
-public interface IDecoderTypFunktionPersister extends IPersister<IDecoderTypFunktion> {
+public interface IDecoderTypFunktionPersister extends IPersister<IDecoderTypFunktion,IDecoderTypFunktionKey> {
     
     /**
      * Adds the entity checking the primary key; fails if the entity all ready exists.

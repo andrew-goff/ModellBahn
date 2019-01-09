@@ -1,8 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.persistence.INamedItemPersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,8 +18,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IWahrung;
 import com.linepro.modellbahn.model.impl.Land;
-
+import com.linepro.modellbahn.persistence.IPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
+import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.rest.util.ApiPaths;
 
@@ -37,16 +36,16 @@ import io.swagger.annotations.ApiOperation;
  * @author  $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.LAND, description = "Land maintenance")
+@Api(value = ApiNames.LAND)
 @Path(ApiPaths.LAND)
-public class LandService extends AbstractNamedItemService<Land> {
+public class LandService extends AbstractItemService<Land,String> {
 
-    private final INamedItemPersister<IWahrung> wahrungPersister;
+    private final IPersister<IWahrung,String> wahrungPersister;
 
     public LandService() {
         super(Land.class);
 
-        wahrungPersister = (INamedItemPersister<IWahrung>) StaticPersisterFactory.get().createPersister(IWahrung.class);
+        wahrungPersister = StaticPersisterFactory.get().createPersister(IWahrung.class);
     }
 
     @JsonCreator
@@ -118,7 +117,7 @@ public class LandService extends AbstractNamedItemService<Land> {
         return super.delete(name);
     }
 
-    public INamedItemPersister<IWahrung> getWahrungPersister() {
+    public IPersister<IWahrung,String> getWahrungPersister() {
         return wahrungPersister;
     }
 }

@@ -1,10 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.model.IZugConsist;
-import com.linepro.modellbahn.persistence.IArtikelPersister;
-import com.linepro.modellbahn.persistence.INamedItemPersister;
-import com.linepro.modellbahn.persistence.IZugConsistPersister;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,12 +19,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IArtikel;
 import com.linepro.modellbahn.model.IZug;
+import com.linepro.modellbahn.model.IZugConsist;
 import com.linepro.modellbahn.model.IZugTyp;
 import com.linepro.modellbahn.model.impl.Zug;
 import com.linepro.modellbahn.model.impl.ZugConsist;
-
+import com.linepro.modellbahn.persistence.INamedItemPersister;
+import com.linepro.modellbahn.persistence.IPersister
+import com.linepro.modellbahn.persistence.IZugConsistPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
+import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.rest.util.ApiPaths;
 
@@ -44,22 +43,22 @@ import io.swagger.annotations.ApiOperation;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.ZUG, description = "Zug maintenance")
+@Api(value = ApiNames.ZUG)
 @Path(ApiPaths.ZUG)
-public class ZugService extends AbstractNamedItemService<IZug> {
+public class ZugService extends AbstractItemService<IZug,String> {
 
-    private final IArtikelPersister artikelPersister;
+    private final IPersister<IArtikel,String> artikelPersister;
 
-    private final INamedItemPersister<IZugTyp> zugTypPersister;
+    private final IPersister<IZugTyp,String> zugTypPersister;
 
     private final IZugConsistPersister consistPersister;
 
     public ZugService() {
         super(Zug.class);
 
-        artikelPersister = StaticPersisterFactory.get().createArtikelPersister();
-        zugTypPersister = StaticPersisterFactory.get().createNamedPersister(IZugTyp.class);
-        consistPersister = StaticPersisterFactory.get().createZugConsistPersister();
+        artikelPersister = StaticPersisterFactory.get().createPersister(IArtikel.class);
+        zugTypPersister = StaticPersisterFactory.get().createPersister(IZugTyp.class);
+        consistPersister = (IZugConsistPersister) StaticPersisterFactory.get().createPersister(IZugConsist.class);
     }
 
     @JsonCreator
@@ -245,7 +244,7 @@ public class ZugService extends AbstractNamedItemService<IZug> {
         return consistPersister;
     }
 
-    public IArtikelPersister getArtikelPersister() {
+    public IPersister<IArtikel,String> getArtikelPersister() {
         return artikelPersister;
     }
 

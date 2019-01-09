@@ -1,7 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.model.IMassstab;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,8 +16,8 @@ import javax.ws.rs.core.UriInfo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.linepro.modellbahn.model.IMassstab;
 import com.linepro.modellbahn.model.impl.Massstab;
-
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -36,9 +34,9 @@ import io.swagger.annotations.ApiOperation;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.MASSSTAB, description = "Massstab maintenance")
+@Api(value = ApiNames.MASSSTAB)
 @Path(ApiPaths.MASSSTAB)
-public class MassstabService extends AbstractNamedItemService<IMassstab> {
+public class MassstabService extends AbstractItemService<IMassstab,String> {
 
     public MassstabService() {
         super(Massstab.class);

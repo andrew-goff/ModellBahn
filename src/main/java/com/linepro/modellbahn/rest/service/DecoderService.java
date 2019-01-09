@@ -1,14 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.persistence.IDecoderTypAdressPersister;
-import com.linepro.modellbahn.persistence.IDecoderTypCVPersister;
-import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
-import com.linepro.modellbahn.persistence.IDecoderTypPersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,8 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -33,17 +22,16 @@ import com.linepro.modellbahn.model.IDecoderAdress;
 import com.linepro.modellbahn.model.IDecoderCV;
 import com.linepro.modellbahn.model.IDecoderFunktion;
 import com.linepro.modellbahn.model.IDecoderTyp;
-import com.linepro.modellbahn.model.IDecoderTypCV;
-import com.linepro.modellbahn.model.IDecoderTypFunktion;
 import com.linepro.modellbahn.model.impl.Decoder;
 import com.linepro.modellbahn.model.impl.DecoderAdress;
 import com.linepro.modellbahn.model.impl.DecoderCV;
 import com.linepro.modellbahn.model.impl.DecoderFunktion;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.Protokoll;
-
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.DecoderCreator;
+import com.linepro.modellbahn.persistence.IDecoderTypPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -64,7 +52,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.DECODER)
 @Path(ApiPaths.DECODER)
-public class DecoderService extends AbstractItemService<IDecoder> {
+public class DecoderService extends AbstractItemService<IDecoder, String> {
 
     protected final IDecoderTypPersister decoderTypPersister;
 

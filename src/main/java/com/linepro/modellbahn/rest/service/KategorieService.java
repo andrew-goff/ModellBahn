@@ -1,30 +1,10 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.linepro.modellbahn.model.IKategorie;
-import com.linepro.modellbahn.model.IUnterKategorie;
-import com.linepro.modellbahn.model.impl.Kategorie;
-import com.linepro.modellbahn.model.impl.UnterKategorie;
-import com.linepro.modellbahn.persistence.DBNames;
-import com.linepro.modellbahn.persistence.IPersister;
-import com.linepro.modellbahn.persistence.IUnterKategoriePersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
-import com.linepro.modellbahn.rest.json.Views;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
-import com.linepro.modellbahn.rest.util.ApiNames;
-import com.linepro.modellbahn.rest.util.ApiPaths;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -40,15 +20,37 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.linepro.modellbahn.model.IKategorie;
+import com.linepro.modellbahn.model.IUnterKategorie;
+import com.linepro.modellbahn.model.impl.Kategorie;
+import com.linepro.modellbahn.model.impl.UnterKategorie;
+import com.linepro.modellbahn.persistence.DBNames;
+import com.linepro.modellbahn.persistence.IUnterKategoriePersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
+import com.linepro.modellbahn.rest.json.Views;
+import com.linepro.modellbahn.rest.util.AbstractItemService;
+import com.linepro.modellbahn.rest.util.ApiNames;
+import com.linepro.modellbahn.rest.util.ApiPaths;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 /**
  * KategorieService. CRUD service for Kategorie and UnterKategorie
  * Transpires that two way ManyToOne are best updated from the parent end 
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.KATEGORIE, description = "Kategorie maintenance")
+@Api(value = ApiNames.KATEGORIE)
 @Path(ApiPaths.KATEGORIE)
-public class KategorieService extends AbstractNamedItemService<IKategorie> {
+public class KategorieService extends AbstractItemService<IKategorie,String> {
 
     private final IUnterKategoriePersister unterKategoriePersister;
 

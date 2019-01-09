@@ -50,7 +50,7 @@ import com.linepro.modellbahn.util.SelectorsBuilder;
  *
  * @param <E> the element type
  */
-public abstract class AbstractItemPersister<E extends IItem, K> implements IPersister<E> {
+public abstract class AbstractItemPersister<E extends IItem, K> implements IPersister<E, K> {
 
     /** The entity manager. */
     private final ISessionManagerFactory sessionManagerFactory;
@@ -149,12 +149,12 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
 
     @Override
     public E update(Long id, E entity) throws Exception {
-        return internalUpdate(new IdKey(id), entity, false);
+        return internalUpdate(id, entity, false);
     }
 
     @Override
     public E update(E entity) throws Exception {
-        return internalUpdate(getItemKey(entity), entity, false);
+        return internalUpdate(entity, false);
     }
 
     @Override
@@ -164,7 +164,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
 
     @Override
     public E save(E entity) throws Exception {
-        return internalUpdate(getItemKey(entity), entity, true);
+        return internalUpdate(entity, true);
     }
 
     /**
@@ -244,15 +244,11 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     public void delete(E entity) throws Exception {
-        delete(getItemKey(entity));
-    }
-
-    private ItemKey getItemKey(E entity) {
-        return new ItemKey(entity, businessKeys.values());
+        delete(entity);
     }
 
     @Override
-    public void delete(IKey key) throws Exception {
+    public void delete(K key) throws Exception {
         ISessionManager session = getSession();
 
         try {
@@ -332,27 +328,34 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public E findByKey(String name, boolean eager) throws Exception {
-        return findByKey(new NameKey(name), eager);
-    }
-
-    @Override
     public E findByKey(E entity, boolean eager) throws Exception {
-        return findByKey(getItemKey(entity), eager);
-    }
-
-    @Override
-    public E findByKey(IKey key, boolean eager) throws Exception {
         ISessionManager session = getSession();
 
         try {
-            E result = internalFindByKey(session, key, eager);
+            Query query = session.getEntityManager().createQuery(businessKeyQuery);
+
+            addCriteria(query, entity);
+
+            return internalFindByKey(query, eager);
+        } catch (Exception e) {
+            error("findByKey error: " + entity, e);
+
+            session.rollback();
+           
+            throw e;
+        }
+    }
+
+    @Override
+    public E findByKey(K key, boolean eager) throws Exception {
+        ISessionManager session = getSession();
+
+        try {
+            Query query = session.getEntityManager().createQuery(businessKeyQuery);
+
+            addCriteria(query, key);
             
-            debug("findByKey found: " + result);
-
-            session.commit();
-
-            return result;
+            return internalFindByKey(query, eager);
         } catch (Exception e) {
             error("findByKey error: " + key, e);
 
@@ -362,11 +365,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         }
     }
 
-    private E internalFindByKey(ISessionManager session, IKey key, boolean eager) throws Exception {
-        Query query = session.getEntityManager().createQuery(businessKeyQuery);
-
-        key.addCriteria(query);
-        
+    private E internalFindByKey(Query query, boolean eager) throws Exception {
         @SuppressWarnings("unchecked")
         List<E> results = (List<E>) query.getResultList();
         
@@ -379,6 +378,9 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         if (results.size() == 1) {
             result = inflate(results.get(0), eager);
         }
+        
+        debug("findByKey found: " + result);
+
         return result;
     }
 
@@ -638,4 +640,8 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     public String getNextId() {
         return idGenerator.getNextId(getEntityName(), idKey);
     }
+
+    abstract void addCriteria(Query query, K key);
+
+    abstract void addCriteria(Query query, E entity);
 }

@@ -1,11 +1,5 @@
 package com.linepro.modellbahn.rest.service;
 
-import com.linepro.modellbahn.persistence.IDecoderTypAdressPersister;
-import com.linepro.modellbahn.persistence.IDecoderTypCVPersister;
-import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
-import com.linepro.modellbahn.persistence.INamedItemPersister;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -32,9 +26,12 @@ import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.DecoderTypAdress;
 import com.linepro.modellbahn.model.impl.DecoderTypCV;
 import com.linepro.modellbahn.model.impl.DecoderTypFunktion;
-
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.Konfiguration;
+import com.linepro.modellbahn.persistence.IDecoderTypAdressPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypCVPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
+import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -42,6 +39,8 @@ import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.rest.util.ApiPaths;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -52,13 +51,13 @@ import io.swagger.annotations.ApiResponses;
  * @author $Author:$
  * @version $Id:$
  */
-@Api(value = ApiNames.DECODER_TYP, description = "DecoderTyp maintenance")
+@Api(value = ApiNames.DECODER_TYP)
 @Path(ApiPaths.DECODER_TYP)
-public class DecoderTypService extends AbstractItemService<IDecoderTyp> {
+public class DecoderTypService extends AbstractItemService<IDecoderTyp, String> {
 
-    private final INamedItemPersister<IHersteller> herstellerPersister;
+    private final IPersister<IHersteller,String> herstellerPersister;
 
-    private final INamedItemPersister<IProtokoll> protokollPersister;
+    private final IPersister<IProtokoll,String> protokollPersister;
 
     private final IDecoderTypAdressPersister adressPersister;
 
@@ -663,11 +662,11 @@ public class DecoderTypService extends AbstractItemService<IDecoderTyp> {
         return funktionPersister;
     }
 
-  public INamedItemPersister<IHersteller> getHerstellerPersister() {
+  public IPersister<IHersteller,String> getHerstellerPersister() {
     return herstellerPersister;
   }
 
-  public INamedItemPersister<IProtokoll> getProtokollPersister() {
+  public IPersister<IProtokoll,String> getProtokollPersister() {
     return protokollPersister;
   }
 

@@ -9,14 +9,13 @@ import com.linepro.modellbahn.model.impl.Decoder;
 import com.linepro.modellbahn.model.impl.DecoderAdress;
 import com.linepro.modellbahn.model.impl.DecoderCV;
 import com.linepro.modellbahn.model.impl.DecoderFunktion;
-import com.linepro.modellbahn.persistence.IDecoderPersister;
 import com.linepro.modellbahn.persistence.IPersister;
 
 public class DecoderCreator implements IDecoderCreator {
 
-    private final IDecoderPersister persister;
+    private final IPersister<IDecoder,String> persister;
 
-    public DecoderCreator(IDecoderPersister persister) {
+    public DecoderCreator(IPersister<IDecoder,String> persister) {
         this.persister = persister;
     }
 
