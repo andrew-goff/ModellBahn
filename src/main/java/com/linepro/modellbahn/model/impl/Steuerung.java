@@ -6,7 +6,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.ISteuerung;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 
@@ -19,7 +19,7 @@ import com.linepro.modellbahn.persistence.DBNames;
 @Entity(name = DBNames.STEUERUNG)
 @Table(name = DBNames.STEUERUNG, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Steuerung extends AbstractNamedItem<NameKey> implements ISteuerung {
+public class Steuerung extends AbstractNamedItem implements ISteuerung {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 6787896300087581256L;

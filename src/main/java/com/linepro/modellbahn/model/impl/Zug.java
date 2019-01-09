@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import com.linepro.modellbahn.model.IZug;
 import com.linepro.modellbahn.model.IZugConsist;
 import com.linepro.modellbahn.model.IZugTyp;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -33,7 +33,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.ZUG)
 @Table(name = DBNames.ZUG, indexes = { @Index(columnList = DBNames.NAME, unique = true), @Index(columnList = DBNames.ZUG_TYP_ID) }, 
        uniqueConstraints = { @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Zug extends AbstractNamedItem<NameKey> implements IZug {
+public class Zug extends AbstractNamedItem implements IZug {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 7391674754023907975L;

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.UnterKategorie;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.refs.IKategorieRef;
 import com.linepro.modellbahn.model.refs.IUnterKategorieRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -34,7 +34,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.NAMEN, ApiNames.BEZEICHNUNG, ApiNames.DELETED, ApiNames.UNTER_KATEGORIEN,
         ApiNames.LINKS })
 @ApiModel(value = ApiNames.KATEGORIE, description = "Category.")
-public interface IKategorie extends INamedItem<NameKey>, IKategorieRef {
+public interface IKategorie extends INamedItem, IKategorieRef {
     
     @JsonGetter(ApiNames.UNTER_KATEGORIEN)
     @JsonView(Views.DropDown.class)

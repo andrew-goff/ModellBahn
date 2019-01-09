@@ -49,7 +49,7 @@ import com.linepro.modellbahn.model.ISpurweite;
 import com.linepro.modellbahn.model.ISteuerung;
 import com.linepro.modellbahn.model.IUnterKategorie;
 import com.linepro.modellbahn.model.IVorbild;
-import com.linepro.modellbahn.model.keys.ProduktKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.BusinessKey;
@@ -83,7 +83,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
         @Index(columnList = DBNames.DECODER_TYP_ID),
         @Index(columnList = DBNames.MOTOR_TYP_ID) }, uniqueConstraints = {
                 @UniqueConstraint(columnNames = { DBNames.HERSTELLER_ID, DBNames.BESTELL_NR }) })
-public class Produkt extends AbstractItem<ProduktKey> implements IProdukt {
+public class Produkt extends AbstractItem implements IProdukt {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 8098838727023710484L;
@@ -533,7 +533,7 @@ public class Produkt extends AbstractItem<ProduktKey> implements IProdukt {
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof Produkt) {
             return new CompareToBuilder()
                     .append(getHersteller(), ((Produkt) other).getHersteller())

@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
  * NB. All properties are objects because they may need to be null for template matching.
  */
 @JsonAutoDetect(fieldVisibility = Visibility.PUBLIC_ONLY)
-public interface IItem<K extends IKey> extends Comparable<IItem<?>>, Serializable, ILinkRef {
+public interface IItem extends Comparable<IItem>, Serializable, ILinkRef {
 
     /**
      * Gets the primary key of this item
@@ -72,7 +72,7 @@ public interface IItem<K extends IKey> extends Comparable<IItem<?>>, Serializabl
      * @param update add an update link
      * @param delete add a delete link
      */
-    IItem<?> addLinks(URI root, boolean update, boolean delete);
+    IItem addLinks(URI root, boolean update, boolean delete);
 
     @JsonIgnore
     String getParentId();

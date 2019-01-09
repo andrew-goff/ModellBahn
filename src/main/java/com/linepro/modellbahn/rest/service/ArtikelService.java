@@ -1,5 +1,9 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IDecoderPersister;
+import com.linepro.modellbahn.persistence.INamedItemPersister;
+import com.linepro.modellbahn.persistence.IProduktPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,7 +36,7 @@ import com.linepro.modellbahn.model.IProdukt;
 import com.linepro.modellbahn.model.ISteuerung;
 import com.linepro.modellbahn.model.IWahrung;
 import com.linepro.modellbahn.model.impl.Artikel;
-import com.linepro.modellbahn.model.keys.ArtikelKey;
+
 import com.linepro.modellbahn.model.util.Status;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -49,6 +53,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.hibernate.annotations.Persister;
 
 /**
  * ArtikelService. CRUD service for Artikel
@@ -58,10 +63,25 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.ARTIKEL, description = "Artikel maintenance")
 @Path(ApiPaths.ARTIKEL)
-public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
+public class ArtikelService extends AbstractItemService<IArtikel> {
+
+    protected final IProduktPersister produktPersister;
+    protected final INamedItemPersister<IWahrung> wahrungPersister;
+    protected final INamedItemPersister<ISteuerung> steuerungPersister;
+    protected final INamedItemPersister<IMotorTyp> motorTypPersister;
+    protected final INamedItemPersister<ILicht> lichtPersister;
+    protected final INamedItemPersister<IKupplung> kupplungPersister;
+    protected final IDecoderPersister decoderPersister;
 
     public ArtikelService() {
         super(Artikel.class);
+        produktPersister = (IProduktPersister) StaticPersisterFactory.get().createPersister(IProdukt.class);
+        wahrungPersister = (INamedItemPersister<IWahrung>) StaticPersisterFactory.get().createPersister(IWahrung.class);
+        steuerungPersister = (INamedItemPersister<ISteuerung>) StaticPersisterFactory.get().createPersister(ISteuerung.class);
+        motorTypPersister = (INamedItemPersister<IMotorTyp>) StaticPersisterFactory.get().createPersister(ISteuerung.class);
+        lichtPersister = (INamedItemPersister<ILicht>) StaticPersisterFactory.get().createPersister(ILicht.class);
+        kupplungPersister = (INamedItemPersister<IKupplung>) StaticPersisterFactory.get().createPersister(IKupplung.class);
+        decoderPersister = (IDecoderPersister) StaticPersisterFactory.get().createPersister(IDecoder.class);
     }
 
     @JsonCreator
@@ -84,13 +104,13 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
             @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
             @JsonProperty(value = ApiNames.STATUS) String statusStr,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
-        IWahrung wahrung = findWahrung(wahrungStr, false);
-        ISteuerung steuerung = findSteuerung(steuerungStr, false);
-        IMotorTyp motorTyp = findMotorTyp(motorTypStr, false);
-        ILicht licht = findLicht(lichtStr, false);
-        IKupplung kupplung = findKupplung(kupplungStr, false);
-        IDecoder decoder = findDecoder(decoderId, false);
+        IProdukt produkt = produktPersister.findByKey(herstellerStr, bestellNr, false);
+        IWahrung wahrung = wahrungPersister.findByKey(wahrungStr, false);
+        ISteuerung steuerung = steuerungPersister.findByKey(steuerungStr, false);
+        IMotorTyp motorTyp = motorTypPersister.findByKey(motorTypStr, false);
+        ILicht licht = lichtPersister.findByKey(lichtStr, false);
+        IKupplung kupplung = kupplungPersister.findByKey(kupplungStr, false);
+        IDecoder decoder = decoderPersister.findByKey(decoderId, false);
         Status status = Status.valueOf(statusStr);
         
         Artikel entity = new Artikel(id, produkt, kaufdatum, wahrung, preis, stuck,
@@ -108,8 +128,8 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
     @Produces(MediaType.APPLICATION_JSON)
     @JsonView(Views.Public.class)
     @ApiOperation(value = "Finds an Artikel by id", response = Artikel.class)
-    public Response get(@PathParam(ApiPaths.ARTIKEL_ID_PARAM_NAME) String id) {
-        return super.get(new ArtikelKey(id));
+    public Response get(@PathParam(ApiPaths.ARTIKEL_ID_PARAM_NAME) String artikelId) {
+        return super.get(artikelId);
     }
 
     @GET
@@ -157,7 +177,7 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
     @JsonView(Views.Public.class)
     @ApiOperation(code = 202, value = "Updates an Artikel by id", response = Artikel.class)
     public Response update(@PathParam(ApiPaths.ARTIKEL_ID_PARAM_NAME) String artikelId, Artikel entity) {
-        return super.update(new ArtikelKey(artikelId), entity);
+        return super.update(artikelId, entity);
     }
 
     @DELETE
@@ -166,7 +186,7 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
     @JsonView(Views.Public.class)
     @ApiOperation(code = 204, value = "Deletes an Artikel by id")
     public Response delete(@PathParam(ApiPaths.ARTIKEL_ID_PARAM_NAME) String artikelId) {
-        return super.delete(new ArtikelKey(artikelId));
+        return super.delete(artikelId);
     }
 
     @PUT
@@ -190,7 +210,7 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IArtikel artikel = findArtikel(artikelId, false);
+            IArtikel artikel = getPersister().findByKey(artikelId, false);
 
             if (artikel != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.ARTIKEL, new String[] { artikelId }, fileDetail, fileData);
@@ -218,7 +238,7 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, Artikel> {
         })
     public Response deleteAbbildung(@PathParam(ApiPaths.ID_PARAM_NAME) String artikelId) {
         try {
-            IArtikel artikel = findArtikel(artikelId, false);
+            IArtikel artikel = getPersister().findByKey(artikelId, false);
 
             if (artikel != null && artikel.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(artikel.getAbbildung());

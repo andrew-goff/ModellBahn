@@ -1,10 +1,30 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.linepro.modellbahn.model.IKategorie;
+import com.linepro.modellbahn.model.IUnterKategorie;
+import com.linepro.modellbahn.model.impl.Kategorie;
+import com.linepro.modellbahn.model.impl.UnterKategorie;
+import com.linepro.modellbahn.persistence.DBNames;
+import com.linepro.modellbahn.persistence.IPersister;
+import com.linepro.modellbahn.persistence.IUnterKategoriePersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
+import com.linepro.modellbahn.rest.json.Views;
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
+import com.linepro.modellbahn.rest.util.ApiNames;
+import com.linepro.modellbahn.rest.util.ApiPaths;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,29 +40,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.linepro.modellbahn.model.IKategorie;
-import com.linepro.modellbahn.model.IUnterKategorie;
-import com.linepro.modellbahn.model.impl.Kategorie;
-import com.linepro.modellbahn.model.impl.UnterKategorie;
-import com.linepro.modellbahn.model.keys.NameKey;
-import com.linepro.modellbahn.persistence.DBNames;
-import com.linepro.modellbahn.persistence.IPersister;
-import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
-import com.linepro.modellbahn.rest.json.Views;
-import com.linepro.modellbahn.rest.util.AbstractItemService;
-import com.linepro.modellbahn.rest.util.ApiNames;
-import com.linepro.modellbahn.rest.util.ApiPaths;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
 /**
  * KategorieService. CRUD service for Kategorie and UnterKategorie
  * Transpires that two way ManyToOne are best updated from the parent end 
@@ -51,14 +48,14 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.KATEGORIE, description = "Kategorie maintenance")
 @Path(ApiPaths.KATEGORIE)
-public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
+public class KategorieService extends AbstractNamedItemService<IKategorie> {
 
-    private final IPersister<UnterKategorie> unterKategoriePersister;
+    private final IUnterKategoriePersister unterKategoriePersister;
 
     public KategorieService() {
         super(Kategorie.class);
 
-        unterKategoriePersister = StaticPersisterFactory.get().createPersister(UnterKategorie.class);
+        unterKategoriePersister = (IUnterKategoriePersister) StaticPersisterFactory.get().createPersister(IUnterKategoriePersister.class);
     }
 
     @JsonCreator
@@ -79,7 +76,7 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
             @JsonProperty(value = ApiNames.NAMEN) String name,
             @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IKategorie kategorie = findKategorie(kategorieStr, false);
+        IKategorie kategorie = getPersister().findByKey(kategorieStr, false);
 
         return new UnterKategorie(id, kategorie, name, bezeichnung, deleted);
     }
@@ -144,13 +141,13 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
     public Response get(@PathParam(ApiPaths.KATEGORIE_PARAM_NAME) String kategorieStr,
             @PathParam(ApiPaths.UNTER_KATEGORIE_PARAM_NAME) String unterKategorieStr) {
         try {
-            IKategorie kategorie = findKategorie(kategorieStr, true);
+            IKategorie kategorie = getPersister().findByKey(kategorieStr, true);
 
             if (kategorie == null) {
                 return getResponse(badRequest(null, "Kategorie " + kategorieStr + " does not exist"));
             }
 
-            IUnterKategorie unterKategorie = findUnterKategorie(kategorieStr, unterKategorieStr, false);
+            IUnterKategorie unterKategorie = getUnterKategoriePersister().findByKey(kategorieStr, unterKategorieStr, false);
 
             if (unterKategorie != null) {
                 return getResponse(ok(), unterKategorie, true, true);
@@ -177,7 +174,7 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
         try {
             logPost(kategorieStr + "/" + unterKategorie);
 
-            Kategorie kategorie = (Kategorie) findKategorie(kategorieStr, true);
+            IKategorie kategorie = getPersister().findByKey(kategorieStr, true);
 
             if (kategorie == null) {
                 return getResponse(badRequest(null, "Kategorie " + kategorieStr + " does not exist"));
@@ -209,13 +206,13 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
         try {
             logPut(kategorieStr + "/" + unterKategorieStr + ": " + newUnterKategorie);
 
-            IKategorie kategorie = findKategorie(kategorieStr, false);
+            IKategorie kategorie = getPersister().findByKey(kategorieStr, false);
 
             if (kategorie == null) {
                 return getResponse(badRequest(null, "Kategorie " + kategorieStr + " does not exist"));
             }
 
-            UnterKategorie unterKategorie = (UnterKategorie) findUnterKategorie(kategorieStr, unterKategorieStr, false);
+            IUnterKategorie unterKategorie = getUnterKategoriePersister().findByKey(kategorieStr, unterKategorieStr, false);
 
             if (unterKategorie == null) {
                 return getResponse(badRequest(null, "Kategorie " + kategorieStr + " does not exist"));
@@ -246,13 +243,13 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
     public Response delete(@PathParam(ApiPaths.KATEGORIE_PARAM_NAME) String kategorieStr,
             @PathParam(ApiPaths.UNTER_KATEGORIE_PARAM_NAME) String unterKategorieStr) {
         try {
-            Kategorie kategorie = (Kategorie) findKategorie(kategorieStr, true);
+            IKategorie kategorie = getPersister().findByKey(kategorieStr, true);
 
             if (kategorie == null) {
                 return getResponse(badRequest(null, "Kategorie " + kategorieStr + " does not exist"));
             }
 
-            UnterKategorie unterKategorie = (UnterKategorie) findUnterKategorie(kategorie, unterKategorieStr, true);
+            IUnterKategorie unterKategorie = getUnterKategoriePersister().findByKey(kategorieStr, unterKategorieStr, true);
 
             if (unterKategorie == null) {
                 return getResponse(badRequest(null, "UnterKategorie " + kategorieStr + "/" + unterKategorieStr + " does not exist"));
@@ -318,7 +315,7 @@ public class KategorieService extends AbstractItemService<NameKey,  Kategorie> {
         }
     }
 
-    private IPersister<UnterKategorie> getUnterKategoriePersister() {
+    private IUnterKategoriePersister getUnterKategoriePersister() {
         return unterKategoriePersister;
     }
 }

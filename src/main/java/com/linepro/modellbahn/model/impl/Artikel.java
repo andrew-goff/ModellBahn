@@ -30,7 +30,7 @@ import com.linepro.modellbahn.model.IMotorTyp;
 import com.linepro.modellbahn.model.IProdukt;
 import com.linepro.modellbahn.model.ISteuerung;
 import com.linepro.modellbahn.model.IWahrung;
-import com.linepro.modellbahn.model.keys.ArtikelKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.model.util.Status;
 import com.linepro.modellbahn.persistence.DBNames;
@@ -53,7 +53,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
         @Index(columnList = DBNames.LICHT_ID),
         @Index(columnList = DBNames.KUPPLUNG_ID),
         @Index(columnList = DBNames.DECODER_ID) })
-public class Artikel extends AbstractItem<ArtikelKey> implements IArtikel {
+public class Artikel extends AbstractItem implements IArtikel {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 8652624782179487496L;

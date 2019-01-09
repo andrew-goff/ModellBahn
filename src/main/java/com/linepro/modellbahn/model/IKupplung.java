@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.refs.IKupplungRef;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.json.serialization.PathSerializer;
@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonRootName(value = ApiNames.KUPPLUNG)
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.NAMEN, ApiNames.BEZEICHNUNG, ApiNames.ABBILDUNG, ApiNames.DELETED, ApiNames.LINKS })
 @ApiModel(value = ApiNames.KUPPLUNG, description = "Coupling configuration - Märklin coding.")
-public interface IKupplung extends INamedItem<NameKey>, IKupplungRef {
+public interface IKupplung extends INamedItem, IKupplungRef {
 
     /**
      * Gets the abbildung.

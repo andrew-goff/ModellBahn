@@ -25,20 +25,20 @@ import com.linepro.modellbahn.model.impl.Hersteller;
 import com.linepro.modellbahn.model.impl.Kategorie;
 import com.linepro.modellbahn.model.impl.Produkt;
 import com.linepro.modellbahn.model.impl.Vorbild;
-import com.linepro.modellbahn.model.keys.ArtikelKey;
-import com.linepro.modellbahn.model.keys.DecoderAdressKey;
-import com.linepro.modellbahn.model.keys.DecoderCVKey;
-import com.linepro.modellbahn.model.keys.DecoderFunktionKey;
-import com.linepro.modellbahn.model.keys.DecoderKey;
-import com.linepro.modellbahn.model.keys.DecoderTypAdressKey;
-import com.linepro.modellbahn.model.keys.DecoderTypCVKey;
-import com.linepro.modellbahn.model.keys.DecoderTypFunktionKey;
-import com.linepro.modellbahn.model.keys.DecoderTypKey;
-import com.linepro.modellbahn.model.keys.NameKey;
-import com.linepro.modellbahn.model.keys.ProduktKey;
-import com.linepro.modellbahn.model.keys.ProduktTeilKey;
-import com.linepro.modellbahn.model.keys.UnterKategorieKey;
-import com.linepro.modellbahn.model.keys.VorbildKey;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import com.linepro.modellbahn.persistence.IKey;
 import com.linepro.modellbahn.persistence.IKeyGenerator;
 import com.linepro.modellbahn.persistence.IPersister;
@@ -72,7 +72,7 @@ public class ConverterFactory implements IConverterFactory {
     }
 
     @Override
-    public <E extends IItem<?>> void registerConverter(Class<E> entityClass) {
+    public <E extends IItem> void registerConverter(Class<E> entityClass) {
         IPersister<E> persister = persisterFactory.createPersister(entityClass);
 
         IKeyGenerator generator = getGenerator(entityClass);

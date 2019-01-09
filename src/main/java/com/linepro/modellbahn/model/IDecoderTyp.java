@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.Hersteller;
 import com.linepro.modellbahn.model.impl.Protokoll;
-import com.linepro.modellbahn.model.keys.DecoderTypKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderTypAdressRef;
 import com.linepro.modellbahn.model.refs.IDecoderTypCVRef;
 import com.linepro.modellbahn.model.refs.IDecoderTypFunktionRef;
@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonRootName(value = ApiNames.DECODER_TYP)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.HERSTELLER, ApiNames.BESTELL_NR, ApiNames.BEZEICHNUNG, ApiNames.PROTOKOLL, ApiNames.FAHRSTUFE, ApiNames.GERAUSCH, ApiNames.I_MAX, ApiNames.KONFIGURATION, ApiNames.DELETED, ApiNames.ADRESSEN, ApiNames.CVS, ApiNames.FUNKTIONEN, ApiNames.LINKS})
 @ApiModel(value = ApiNames.DECODER_TYP, description = "Decoder type - template for Decoder.")
-public interface IDecoderTyp extends IItem<DecoderTypKey>, IDecoderTypRef {
+public interface IDecoderTyp extends IItem, IDecoderTypRef {
 
     @JsonSetter(ApiNames.HERSTELLER)
     @JsonDeserialize(as= Hersteller.class)

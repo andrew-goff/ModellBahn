@@ -1,5 +1,7 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.model.ISonderModell;
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.impl.SonderModell;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -36,7 +38,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.SONDERMODELL, description = "SonderModell maintenance")
 @Path(ApiPaths.SONDERMODELL)
-public class SonderModellService extends AbstractItemService<NameKey, SonderModell> {
+public class SonderModellService extends AbstractNamedItemService<ISonderModell> {
 
     public SonderModellService() {
         super(SonderModell.class);

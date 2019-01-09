@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.IKupplung;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.PathConverter;
@@ -26,7 +26,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.KUPPLUNG)
 @Table(name = DBNames.KUPPLUNG, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Kupplung extends AbstractNamedItem<NameKey> implements IKupplung {
+public class Kupplung extends AbstractNamedItem implements IKupplung {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -3158490202101950479L;

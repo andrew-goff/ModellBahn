@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.linepro.modellbahn.model.IItem;
 import com.linepro.modellbahn.model.IProdukt;
 import com.linepro.modellbahn.model.IProduktTeil;
-import com.linepro.modellbahn.model.keys.ProduktTeilKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.BusinessKey;
@@ -40,7 +40,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
         @Index(columnList = DBNames.PRODUKT_ID),
         @Index(columnList = DBNames.TEIL_ID) }, uniqueConstraints = {
                 @UniqueConstraint(columnNames = { DBNames.PRODUKT_ID, DBNames.TEIL_ID }) })
-public class ProduktTeil extends AbstractItem<ProduktTeilKey> implements IProduktTeil {
+public class ProduktTeil extends AbstractItem implements IProduktTeil {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 7684916028825247336L;
@@ -130,7 +130,7 @@ public class ProduktTeil extends AbstractItem<ProduktTeilKey> implements IProduk
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof ProduktTeil) {
             return new CompareToBuilder()
                     .append(getProdukt(), ((ProduktTeil) other).getProdukt())

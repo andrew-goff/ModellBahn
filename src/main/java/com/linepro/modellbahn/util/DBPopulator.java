@@ -67,11 +67,11 @@ import com.linepro.modellbahn.model.impl.Wahrung;
 import com.linepro.modellbahn.model.impl.Zug;
 import com.linepro.modellbahn.model.impl.ZugConsist;
 import com.linepro.modellbahn.model.impl.ZugTyp;
-import com.linepro.modellbahn.model.keys.DecoderTypKey;
-import com.linepro.modellbahn.model.keys.NameKey;
-import com.linepro.modellbahn.model.keys.ProduktKey;
-import com.linepro.modellbahn.model.keys.UnterKategorieKey;
-import com.linepro.modellbahn.model.keys.VorbildKey;
+
+
+
+
+
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.DecoderCreator;
 import com.linepro.modellbahn.model.util.Konfiguration;
@@ -2216,7 +2216,7 @@ public class DBPopulator {
         addZugTyp("MILITAR", "Militär Zug");
     }
 
-    private <E extends IItem<?>> E findByKey(IKey key, Class<E> entityClass) {
+    private <E extends IItem> E findByKey(IKey key, Class<E> entityClass) {
         try {
             IPersister<E> persister = persisterFactory.createPersister(entityClass);
 
@@ -2228,7 +2228,7 @@ public class DBPopulator {
         return null;
     }
 
-    private <E extends IItem<?>> E findName(String name, Class<E> entityClass) {
+    private <E extends IItem> E findName(String name, Class<E> entityClass) {
         return findByKey(new NameKey(name), entityClass);
     }
 
@@ -2325,7 +2325,7 @@ public class DBPopulator {
         return findByKey(new NameKey(name), ZugTyp.class);
     }
     
-    private <E extends IItem<?>> E save(E item) {
+    private <E extends IItem> E save(E item) {
         try {
             @SuppressWarnings("unchecked")
             IPersister<E> persister = (IPersister<E>) persisterFactory.createPersister(item.getClass());
@@ -2338,7 +2338,7 @@ public class DBPopulator {
         return null;
     }
 
-    private <E extends IItem<?>> E update(E item) {
+    private <E extends IItem> E update(E item) {
         try {
             @SuppressWarnings("unchecked")
             IPersister<E> persister = (IPersister<E>) persisterFactory.createPersister(item.getClass());
@@ -2351,7 +2351,7 @@ public class DBPopulator {
         return null;
     }
 
-    private <E extends IItem<?>> void dump(Class<E> entityClass) {
+    private <E extends IItem> void dump(Class<E> entityClass) {
         try {
             IPersister<E> persister = persisterFactory.createPersister(entityClass);
         

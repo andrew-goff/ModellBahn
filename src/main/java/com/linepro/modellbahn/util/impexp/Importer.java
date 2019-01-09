@@ -18,7 +18,7 @@ import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.util.Selector;
 
-public class Importer<E extends IItem<?>> {
+public class Importer<E extends IItem> {
 
     /** The logger. */
     private final Logger logger;

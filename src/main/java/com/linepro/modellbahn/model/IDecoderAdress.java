@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.Decoder;
-import com.linepro.modellbahn.model.keys.DecoderAdressKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderAdressRef;
 import com.linepro.modellbahn.model.refs.IDecoderRef;
 import com.linepro.modellbahn.model.util.AdressTyp;
@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.ADRESS)
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.DECODER, ApiNames.INDEX, ApiNames.ADRESS_TYP, ApiNames.ADRESS, ApiNames.DELETED, ApiNames.LINKS })
 @ApiModel(value = ApiNames.ADRESS, description = "Decoder address setting.")
-public interface IDecoderAdress extends IItem<DecoderAdressKey>, IDecoderAdressRef {
+public interface IDecoderAdress extends IItem, IDecoderAdressRef {
 
     @JsonGetter(ApiNames.DECODER)
     @JsonView(Views.DropDown.class)

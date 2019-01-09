@@ -31,7 +31,7 @@ import com.linepro.modellbahn.model.impl.Spurweite;
 import com.linepro.modellbahn.model.impl.Steuerung;
 import com.linepro.modellbahn.model.impl.UnterKategorie;
 import com.linepro.modellbahn.model.impl.Vorbild;
-import com.linepro.modellbahn.model.keys.ProduktKey;
+
 import com.linepro.modellbahn.model.refs.IAchsfolgRef;
 import com.linepro.modellbahn.model.refs.IAufbauRef;
 import com.linepro.modellbahn.model.refs.IBahnverwaltungRef;
@@ -73,7 +73,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
         ApiNames.MOTOR_TYP, ApiNames.LANGE, ApiNames.ANLEITUNGEN, ApiNames.EXPLOSIONSZEICHNUNG, ApiNames.ABBILDUNG,
         ApiNames.TEILEN, ApiNames.DELETED, ApiNames.LINKS })
 @ApiModel(value = ApiNames.PRODUKT, description = "Product - template for article.")
-public interface IProdukt extends IItem<ProduktKey>, IProduktRef {
+public interface IProdukt extends IItem, IProduktRef {
 
     @JsonSetter(ApiNames.HERSTELLER)
     @JsonDeserialize(as = Hersteller.class)

@@ -10,7 +10,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.IHersteller;
-import com.linepro.modellbahn.model.keys.NameKey;
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.URLConverter;
@@ -26,7 +25,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.HERSTELLER)
 @Table(name = DBNames.HERSTELLER, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Hersteller extends AbstractNamedItem<NameKey> implements IHersteller {
+public class Hersteller extends AbstractNamedItem implements IHersteller {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2896366936132390553L;

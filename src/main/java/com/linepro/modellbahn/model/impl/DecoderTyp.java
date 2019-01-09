@@ -34,7 +34,7 @@ import com.linepro.modellbahn.model.IDecoderTypFunktion;
 import com.linepro.modellbahn.model.IHersteller;
 import com.linepro.modellbahn.model.IItem;
 import com.linepro.modellbahn.model.IProtokoll;
-import com.linepro.modellbahn.model.keys.DecoderTypKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.model.util.Konfiguration;
 import com.linepro.modellbahn.persistence.DBNames;
@@ -53,7 +53,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Table(name = DBNames.DECODER_TYP, indexes = { @Index(columnList = DBNames.HERSTELLER_ID),
         @Index(columnList = DBNames.PROTOKOLL_ID) }, uniqueConstraints = {
                 @UniqueConstraint(columnNames = { DBNames.HERSTELLER_ID, DBNames.BESTELL_NR }) })
-public class DecoderTyp extends AbstractItem<DecoderTypKey> implements IDecoderTyp {
+public class DecoderTyp extends AbstractItem implements IDecoderTyp {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 8503812316290492490L;
@@ -303,7 +303,7 @@ public class DecoderTyp extends AbstractItem<DecoderTypKey> implements IDecoderT
     }
     
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof DecoderTyp) {
             return new CompareToBuilder()
                     .append(getHersteller(), ((DecoderTyp) other).getHersteller())

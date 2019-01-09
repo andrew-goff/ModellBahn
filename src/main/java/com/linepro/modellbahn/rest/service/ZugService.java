@@ -1,5 +1,10 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.model.IZugConsist;
+import com.linepro.modellbahn.persistence.IArtikelPersister;
+import com.linepro.modellbahn.persistence.INamedItemPersister;
+import com.linepro.modellbahn.persistence.IZugConsistPersister;
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,14 +25,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IArtikel;
 import com.linepro.modellbahn.model.IZug;
 import com.linepro.modellbahn.model.IZugTyp;
-import com.linepro.modellbahn.model.impl.Artikel;
 import com.linepro.modellbahn.model.impl.Zug;
 import com.linepro.modellbahn.model.impl.ZugConsist;
-import com.linepro.modellbahn.model.keys.NameKey;
-import com.linepro.modellbahn.persistence.IPersister;
+
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
-import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.rest.util.ApiPaths;
 
@@ -44,14 +46,20 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.ZUG, description = "Zug maintenance")
 @Path(ApiPaths.ZUG)
-public class ZugService extends AbstractItemService<NameKey, Zug> {
+public class ZugService extends AbstractNamedItemService<IZug> {
 
-    private final IPersister<ZugConsist> consistPersister;
+    private final IArtikelPersister artikelPersister;
+
+    private final INamedItemPersister<IZugTyp> zugTypPersister;
+
+    private final IZugConsistPersister consistPersister;
 
     public ZugService() {
         super(Zug.class);
-        
-        consistPersister = StaticPersisterFactory.get().createPersister(ZugConsist.class);
+
+        artikelPersister = StaticPersisterFactory.get().createArtikelPersister();
+        zugTypPersister = StaticPersisterFactory.get().createNamedPersister(IZugTyp.class);
+        consistPersister = StaticPersisterFactory.get().createZugConsistPersister();
     }
 
     @JsonCreator
@@ -60,7 +68,7 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
             @JsonProperty(value = ApiNames.NAMEN) String name,
             @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IZugTyp zugTyp = findZugTyp(zugTypStr, false);
+        IZugTyp zugTyp = getZugTypPersister().findByKey(zugTypStr, false);
 
         Zug entity = new Zug(id, name, bezeichnung, zugTyp, deleted);
 
@@ -75,8 +83,8 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
             @JsonProperty(value = ApiNames.POSITION) Integer position,
             @JsonProperty(value = ApiNames.ARTIKEL) String artikelStr,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IZug zug = findZug(zugStr, true);
-        IArtikel artikel = findArtikel(artikelStr, false);
+        IZug zug = getPersister().findByKey(zugStr, true);
+        IArtikel artikel = getArtikelPersister().findByKey(artikelStr, false);
         
         ZugConsist entity = new ZugConsist(id,  zug, position, artikel, deleted);
 
@@ -149,19 +157,19 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
         try {
             logPost(zugStr + "/" + artikelId);
 
-            Zug zug = (Zug) findZug(zugStr, true);
+            IZug zug = getPersister().findByKey(zugStr, true);
 
             if (zug == null) {
                 return getResponse(badRequest(null, "Zug " + zugStr + " does not exist"));
             }
 
-            Artikel artikel = (Artikel) findArtikel(artikelId, true);
+            IArtikel artikel = getArtikelPersister().findByKey(artikelId, true);
 
             if (artikel == null) {
                 return getResponse(badRequest(null, "Artikel " + artikelId + " does not exist"));
             }
 
-            ZugConsist zugConsist = new ZugConsist(null, zug, null, artikel, false);
+            IZugConsist zugConsist = new ZugConsist(null, zug, null, artikel, false);
 
             zug.addConsist(zugConsist);
 
@@ -183,13 +191,13 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
         try {
             logPost(zugStr + "/" + position + "?" + artikelId);
 
-            ZugConsist consist = (ZugConsist) findZugConsist(zugStr, position, true);
+            IZugConsist consist = getConsistPersister().findByKey(zugStr, position, true);
 
             if (consist == null) {
                 return getResponse(badRequest(null, "ZugConsist " + zugStr + "/" + position + " does not exist"));
             }
 
-            Artikel artikel = (Artikel) findArtikel(artikelId, true);
+            IArtikel artikel = getArtikelPersister().findByKey(artikelId, true);
 
             if (artikel == null) {
                 return getResponse(badRequest(null, "Artikel " + artikelId + " does not exist"));
@@ -212,13 +220,13 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
     @ApiOperation(code = 204, value = "Removes a vehicle from a named Zug")
     public Response deleteConsist(@PathParam(ApiPaths.ZUG_PARAM_NAME) String zugStr, @PathParam(ApiPaths.POSITION_PARAM_NAME) Integer position) {
         try {
-            ZugConsist zugConsist = (ZugConsist) findZugConsist(zugStr, position, true);
+            IZugConsist zugConsist = getConsistPersister().findByKey(zugStr, position, true);
 
             if (zugConsist == null) {
                 return getResponse(badRequest(null, "ZugConsist " + zugStr + "/" + position + " does not exist"));
             }
 
-            Zug zug = (Zug) zugConsist.getZug();
+            IZug zug = zugConsist.getZug();
 
             zug.removeConsist(zugConsist);
 
@@ -233,7 +241,15 @@ public class ZugService extends AbstractItemService<NameKey, Zug> {
         }
     }
 
-    private IPersister<ZugConsist> getConsistPersister() {
+    private IZugConsistPersister getConsistPersister() {
         return consistPersister;
+    }
+
+    public IArtikelPersister getArtikelPersister() {
+        return artikelPersister;
+    }
+
+    public INamedItemPersister<IZugTyp> getZugTypPersister() {
+        return zugTypPersister;
     }
 }

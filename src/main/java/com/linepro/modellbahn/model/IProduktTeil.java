@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.Produkt;
 import com.linepro.modellbahn.model.impl.ProduktTeil;
-import com.linepro.modellbahn.model.keys.ProduktTeilKey;
+
 import com.linepro.modellbahn.model.refs.IProduktRef;
 import com.linepro.modellbahn.model.refs.IProduktTeilRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonRootName(value = ApiNames.TEIL)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.PRODUKT,ApiNames.TEIL, ApiNames.ANZAHL, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.TEIL, description = "Part of product (spares for rolling stock - contents for set &c).")
-public interface IProduktTeil extends IItem<ProduktTeilKey>, IProduktTeilRef {
+public interface IProduktTeil extends IItem, IProduktTeilRef {
 
     @JsonGetter(ApiNames.PRODUKT)
     @JsonView(Views.DropDown.class)

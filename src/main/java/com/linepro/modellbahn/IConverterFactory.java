@@ -9,5 +9,5 @@ import com.linepro.modellbahn.model.IItem;
  */
 public interface IConverterFactory {
     
-    <E extends IItem<?>> void registerConverter(Class<E> clazz);
+    <E extends IItem> void registerConverter(Class<E> clazz);
 }

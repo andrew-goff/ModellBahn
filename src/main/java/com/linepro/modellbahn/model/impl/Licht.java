@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.ILicht;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.PathConverter;
@@ -26,7 +26,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.LICHT)
 @Table(name = DBNames.LICHT, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Licht extends AbstractNamedItem<NameKey> implements ILicht {
+public class Licht extends AbstractNamedItem implements ILicht {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 6288751316098975414L;

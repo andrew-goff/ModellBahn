@@ -15,7 +15,7 @@ import com.linepro.modellbahn.rest.json.serialization.LinkSerializer;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class ListWithLinks<E extends IItem<?>> {
+public class ListWithLinks<E extends IItem> {
 
     private final List<E> entities;
     

@@ -14,7 +14,7 @@ import com.linepro.modellbahn.util.Selector;
  * @version  $Id$
  * @param <E> the element type
  */
-public interface IPersister<E extends IItem<?>> {
+public interface IPersister<E extends IItem> {
     
     /**
      * Adds the entity checking the primary key; fails if the entity all ready exists.
@@ -34,8 +34,6 @@ public interface IPersister<E extends IItem<?>> {
      * @throws Exception if there more than one match or there is a DB error
      */
     E findById(Long id, boolean eager) throws Exception;
-
-    E findByKey(Long id, boolean eager) throws Exception;
 
     E findByKey(String name, boolean eager) throws Exception;
 

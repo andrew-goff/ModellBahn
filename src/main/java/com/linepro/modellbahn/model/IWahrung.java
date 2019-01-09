@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiModel;
 @JsonRootName(value = ApiNames.WAHRUNG)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.NAMEN, ApiNames.BEZEICHNUNG, ApiNames.DECIMALS, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.WAHRUNG, description = "A currency.")
-public interface IWahrung extends IWahrungRef {
+public interface IWahrung extends INamedItem, IWahrungRef {
 
     @JsonSetter(ApiNames.NAMEN)
     void setName(String name);

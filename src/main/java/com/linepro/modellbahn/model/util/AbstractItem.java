@@ -38,7 +38,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
  */
 @MappedSuperclass
 @Cacheable
-public abstract class AbstractItem<K extends IKey> implements IItem<K> {
+public abstract class AbstractItem implements IItem {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 938276986391979417L;
@@ -118,7 +118,7 @@ public abstract class AbstractItem<K extends IKey> implements IItem<K> {
     }
     
     @Override
-    public IItem<K> addLinks(URI root, boolean update, boolean delete) {
+    public IItem addLinks(URI root, boolean update, boolean delete) {
         getLinks().clear();
 
         addParent(root);
@@ -140,9 +140,9 @@ public abstract class AbstractItem<K extends IKey> implements IItem<K> {
     protected void addChildLinks(URI root, boolean update, boolean delete) {
     }
 
-    protected void addLinks(URI root, Collection<? extends IItem<?>> items, boolean update, boolean delete) {
+    protected void addLinks(URI root, Collection<? extends IItem> items, boolean update, boolean delete) {
         if (!items.isEmpty()) {
-            for (IItem<?> item : items) {
+            for (IItem item : items) {
                 item.addLinks(root, update, delete);
             }
         }
@@ -168,7 +168,7 @@ public abstract class AbstractItem<K extends IKey> implements IItem<K> {
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         return new CompareToBuilder()
                 .append(getId(), other.getId())
                 .toComparison();
@@ -193,7 +193,7 @@ public abstract class AbstractItem<K extends IKey> implements IItem<K> {
 			return false;
 		}
 
-		IItem<?> other = (IItem<?>) obj;
+		IItem other = (IItem) obj;
 
 		return new EqualsBuilder().append(getId(), other.getId()).isEquals();
 	}

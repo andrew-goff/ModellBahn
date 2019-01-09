@@ -1,5 +1,21 @@
 package com.linepro.modellbahn.persistence.impl;
 
+import com.linepro.modellbahn.model.IArtikel;
+import com.linepro.modellbahn.model.IDecoder;
+import com.linepro.modellbahn.model.IDecoderAdress;
+import com.linepro.modellbahn.model.IDecoderCV;
+import com.linepro.modellbahn.model.IDecoderFunktion;
+import com.linepro.modellbahn.model.IDecoderTyp;
+import com.linepro.modellbahn.model.IDecoderTypAdress;
+import com.linepro.modellbahn.model.IDecoderTypCV;
+import com.linepro.modellbahn.model.IDecoderTypFunktion;
+import com.linepro.modellbahn.model.IProdukt;
+import com.linepro.modellbahn.model.IProduktTeil;
+import com.linepro.modellbahn.model.IUnterKategorie;
+import com.linepro.modellbahn.model.IVorbild;
+import com.linepro.modellbahn.model.impl.ZugConsist;
+import com.linepro.modellbahn.persistence.IDecoderFunktionPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +42,7 @@ public class PersisterFactory implements IPersisterFactory {
     private final ILoggerFactory logManager;
 
     /** The persisters. */
-    private final Map<Class<? extends IItem<?>>,IPersister<? extends IItem<?>>> persisters = new HashMap<>();
+    private final Map<Class<? extends IItem>,IPersister<? extends IItem>> persisters = new HashMap<>();
     
     /**
      * Instantiates a new persister factory.
@@ -41,13 +57,43 @@ public class PersisterFactory implements IPersisterFactory {
     }
 
     @Override
-    public synchronized <E extends IItem<?>> IPersister<E> createPersister(Class<E> entityClass) {
+    public synchronized <E extends IItem> IPersister<E> createPersister(Class<E> entityClass) {
         @SuppressWarnings("unchecked")
         IPersister<E> persister = (IPersister<E>) persisters.get(entityClass);
         
         if (persister == null) {
-            persister = new ItemPersister<>(sessionManagerFactory, logManager, entityClass);
-            
+            if (IArtikel.class.isAssignableFrom(entityClass)) {
+                persister = new ArtikelPersister(sessionManagerFactory, logManager);
+            } else if (IDecoder.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderAdress.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderAdressPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderCV.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderCVPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderFunktion.class.isAssignableFrom(entityClass)) {
+                persister = new IDecoderFunktionPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderTyp.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderTypPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderTypAdress.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderTypAdressPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderTypCV.class.isAssignableFrom(entityClass)) {
+                persister = new DecoderTypCVPersister(sessionManagerFactory, logManager);
+            } else if (IDecoderTypFunktion.class.isAssignableFrom(entityClass)) {
+                persister = new IDecoderTypFunktionPersister(sessionManagerFactory, logManager);
+            } else if (IProdukt.class.isAssignableFrom(entityClass)) {
+                persister = new ProduktPersister(sessionManagerFactory, logManager);
+            } else if (IProduktTeil.class.isAssignableFrom(entityClass)) {
+                persister = new ProduktTeilPersister(sessionManagerFactory, logManager);
+            } else if (IUnterKategorie.class.isAssignableFrom(entityClass)) {
+                persister = new UnterKategoriePersister(sessionManagerFactory, logManager);
+            } else if (IVorbild.class.isAssignableFrom(entityClass)) {
+                persister = new VorbildPersister(sessionManagerFactory, logManager);
+            } else if (ZugConsist.class.isAssignableFrom(entityClass)) {
+                persister = new ZugConsistPersister(sessionManagerFactory, logManager);
+            } else if (INamedItem.class.isAssignableFrom(entityClass)) {
+                persister = new NamedItemPersister<>(sessionManagerFactory, logManager, entityClass);
+            }
+
             persisters.put(entityClass, persister);
         }
         

@@ -9,7 +9,7 @@ import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.ILand;
 import com.linepro.modellbahn.model.IWahrung;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -24,7 +24,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.LAND)
 @Table(name = DBNames.LAND, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Land extends AbstractNamedItem<NameKey> implements ILand {
+public class Land extends AbstractNamedItem implements ILand {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -5352015940349871580L;

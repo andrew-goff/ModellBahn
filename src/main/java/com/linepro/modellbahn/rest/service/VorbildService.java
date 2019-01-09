@@ -1,5 +1,8 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.INamedItemPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,7 +33,7 @@ import com.linepro.modellbahn.model.IGattung;
 import com.linepro.modellbahn.model.IUnterKategorie;
 import com.linepro.modellbahn.model.IVorbild;
 import com.linepro.modellbahn.model.impl.Vorbild;
-import com.linepro.modellbahn.model.keys.VorbildKey;
+
 import com.linepro.modellbahn.model.util.LeistungsUbertragung;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -54,23 +57,34 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.VORBILD, description = "Vorbild maintenance")
 @Path(ApiPaths.VORBILD)
-public class VorbildService extends AbstractItemService<VorbildKey, Vorbild> {
+public class VorbildService extends AbstractNamedItemService<IVorbild> {
+
+    protected final INamedItemPersister<IGattung> gattungPersister;
+    protected final INamedItemPersister<IBahnverwaltung> bahnverwaltungPersister;
+    protected final INamedItemPersister<IAntrieb> antriebPersister;
+    protected final INamedItemPersister<IAchsfolg> achsfolgPersister;
 
     public VorbildService() {
         super(Vorbild.class);
+
+        gattungPersister = (INamedItemPersister<IGattung>) StaticPersisterFactory.get().createPersister(IGattung.class);
+        bahnverwaltungPersister = (INamedItemPersister<IBahnverwaltung>) StaticPersisterFactory.get().createPersister(IBahnverwaltung.class);
+        antriebPersister = (INamedItemPersister<IAntrieb>) StaticPersisterFactory.get().createPersister(IAntrieb.class);
+        achsfolgPersister = (INamedItemPersister<IAchsfolg>) StaticPersisterFactory.get().createPersister(IAchsfolg.class);
+
     }
 
     @JsonCreator
     public Vorbild create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.GATTUNG) IGattung gattung,
+            @JsonProperty(value = ApiNames.GATTUNG) String gattungStr,
             @JsonProperty(value = ApiNames.UNTER_KATEGORIE, required=true) IUnterKategorie unterKategorie,
-            @JsonProperty(value = ApiNames.BAHNVERWALTUNG) IBahnverwaltung bahnverwaltung,
+            @JsonProperty(value = ApiNames.BAHNVERWALTUNG) String bahnverwaltungStr,
             @JsonProperty(value = ApiNames.HERSTELLER) String hersteller,
             @JsonProperty(value = ApiNames.BAUZEIT) LocalDate bauzeit,
             @JsonProperty(value = ApiNames.ANZAHL) Integer anzahl,
             @JsonProperty(value = ApiNames.BETREIBSNUMMER) String betreibsNummer,
-            @JsonProperty(value = ApiNames.ANTRIEB) IAntrieb antrieb,
-            @JsonProperty(value = ApiNames.ACHSFOLG) IAchsfolg achsfolg,
+            @JsonProperty(value = ApiNames.ANTRIEB) String antriebStr,
+            @JsonProperty(value = ApiNames.ACHSFOLG) String achsfolgStr,
             @JsonProperty(value = ApiNames.ANFAHRZUGKRAFT) BigDecimal anfahrzugkraft,
             @JsonProperty(value = ApiNames.LEISTUNG) BigDecimal leistung,
             @JsonProperty(value = ApiNames.DIENSTGEWICHT) BigDecimal dienstgewicht,
@@ -105,6 +119,11 @@ public class VorbildService extends AbstractItemService<VorbildKey, Vorbild> {
             @JsonProperty(value = ApiNames.ANMERKUNG) String anmerkung,
             @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
+        IGattung gattung = getGattungPersister().findByKey(gattungStr);
+        IBahnverwaltung bahnverwaltung = getGattungPersister().findByKey(bahnverwaltungStr);
+        IAntrieb antrieb = getAntriebPersister().findByKey(antriebStr);
+        IAchsfolg achsfolg = getAchsfolgPersister().findByKey(achsfolgStr);
+
         Vorbild entity = new Vorbild(id, gattung, unterKategorie, bahnverwaltung, hersteller, bauzeit, anzahl, betreibsNummer, antrieb, achsfolg, anmerkung, anfahrzugkraft, leistung, dienstgewicht,
                 geschwindigkeit, lange, ausserdienst, dmTreibrad, dmLaufradVorn, dmLaufradHinten, zylinder, dmZylinder, kolbenhub, kesselueberdruck, rostflaeche, ueberhitzerflaeche,
                 wasservorrat, verdampfung, fahrmotoren, anmerkung, leistungsUbertragung, reichweite, kapazitaet, klasse, sitzPlatzeKL1, sitzPlatzeKL2, sitzPlatzeKL3,
@@ -122,7 +141,7 @@ public class VorbildService extends AbstractItemService<VorbildKey, Vorbild> {
     @ApiOperation(value = "Finds a Vorbild by name", response = Vorbild.class)
     public Response get(@PathParam(ApiPaths.NAME_PARAM_NAME) String name) {
         try {
-            return super.get(new VorbildKey(findGattung(name, false)));
+            return super.get(name);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -226,7 +245,7 @@ public class VorbildService extends AbstractItemService<VorbildKey, Vorbild> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IVorbild vorbild = findVorbild(name, false);
+            IVorbild vorbild = getPersister().findByKey(name, false);
 
             if (vorbild != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.VORBILD, new String[] { name }, fileDetail, fileData);
@@ -251,7 +270,7 @@ public class VorbildService extends AbstractItemService<VorbildKey, Vorbild> {
     @ApiOperation(value = "Removes the picture from a named Vorbild", response = Vorbild.class)
     public Response deleteAbbildung(@PathParam(ApiPaths.ID_PARAM_NAME) String name) {
         try {
-            IVorbild vorbild = findVorbild(name, false);
+            IVorbild vorbild = getPersister().findByKey(name, false);
 
             if (vorbild != null && vorbild.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(vorbild.getAbbildung());

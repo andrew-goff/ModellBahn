@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
-import com.linepro.modellbahn.model.keys.DecoderTypAdressKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderTypAdressRef;
 import com.linepro.modellbahn.model.refs.IDecoderTypRef;
 import com.linepro.modellbahn.model.util.AdressTyp;
@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.ADRESS)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.DECODER_TYP,  ApiNames.INDEX,  ApiNames.ADRESS_TYP,  ApiNames.SPAN,  ApiNames.WERKSEINSTELLUNG, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.ADRESS, description = "Decoder type address - template for Decoder.")
-public interface IDecoderTypAdress extends IItem<DecoderTypAdressKey>, IDecoderTypAdressRef {
+public interface IDecoderTypAdress extends IItem, IDecoderTypAdressRef {
 
     /**
      * Gets the decoder typ.

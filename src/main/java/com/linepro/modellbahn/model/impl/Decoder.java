@@ -26,7 +26,7 @@ import com.linepro.modellbahn.model.IDecoderCV;
 import com.linepro.modellbahn.model.IDecoderFunktion;
 import com.linepro.modellbahn.model.IDecoderTyp;
 import com.linepro.modellbahn.model.IProtokoll;
-import com.linepro.modellbahn.model.keys.DecoderKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.BusinessKey;
@@ -42,7 +42,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.DECODER)
 @Table(name = DBNames.DECODER, indexes = { @Index(columnList = DBNames.DECODER_ID, unique = true), @Index(columnList = DBNames.DECODER_TYP_ID),
         @Index(columnList = DBNames.PROTOKOLL_ID) }, uniqueConstraints = { @UniqueConstraint(columnNames = { DBNames.DECODER_ID }) })
-public class Decoder extends AbstractItem<DecoderKey> implements IDecoder {
+public class Decoder extends AbstractItem implements IDecoder {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 44440227704021482L;

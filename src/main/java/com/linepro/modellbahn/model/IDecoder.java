@@ -14,7 +14,7 @@ import com.linepro.modellbahn.model.impl.DecoderCV;
 import com.linepro.modellbahn.model.impl.DecoderFunktion;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.Protokoll;
-import com.linepro.modellbahn.model.keys.DecoderKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderAdressRef;
 import com.linepro.modellbahn.model.refs.IDecoderCVRef;
 import com.linepro.modellbahn.model.refs.IDecoderFunktionRef;
@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonRootName(value = ApiNames.DECODER)
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.DECODER_ID, ApiNames.DECODER_TYP, ApiNames.BEZEICHNUNG, ApiNames.PROTOKOLL, ApiNames.FAHRSTUFE, ApiNames.DELETED, ApiNames.ADRESSEN, ApiNames.CVS, ApiNames.FUNKTIONEN, ApiNames.LINKS })
 @ApiModel(value = ApiNames.DECODER, description = "Decoder - installed or spare.")
-public interface IDecoder extends IItem<DecoderKey>, IDecoderRef {
+public interface IDecoder extends IItem, IDecoderRef {
 
     @JsonSetter(ApiNames.DECODER_ID)
     void setDecoderId(String  name);

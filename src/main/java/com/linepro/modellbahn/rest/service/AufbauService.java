@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IAufbau;
 import com.linepro.modellbahn.model.impl.Aufbau;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -48,7 +49,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.AUFBAU, description = "Aufbau maintenance")
 @Path(ApiPaths.AUFBAU)
-public class AufbauService extends AbstractItemService<NameKey, Aufbau> {
+public class AufbauService extends AbstractNamedItemService<IAufbau> {
 
     public AufbauService() {
         super(Aufbau.class);
@@ -140,7 +141,7 @@ public class AufbauService extends AbstractItemService<NameKey, Aufbau> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IAufbau aufbau = findAufbau(name, false);
+            IAufbau aufbau = getPersister().findByKey(name, false);
 
             if (aufbau != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.ARTIKEL, new String[] { name }, fileDetail, fileData);
@@ -168,7 +169,7 @@ public class AufbauService extends AbstractItemService<NameKey, Aufbau> {
         })
     public Response deleteAbbildung(@PathParam(ApiPaths.ID_PARAM_NAME) String name) {
         try {
-            IAufbau aufbau = findAufbau(name, false);
+            IAufbau aufbau = getPersister().findByKey(name, false);
 
             if (aufbau != null && aufbau.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(aufbau.getAbbildung());

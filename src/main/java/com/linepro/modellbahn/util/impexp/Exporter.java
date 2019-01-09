@@ -35,7 +35,7 @@ import com.linepro.modellbahn.util.Selector;
  * The Class Exporter.
  * @param <E> the element type
  */
-public class Exporter<E extends IItem<?>> {
+public class Exporter<E extends IItem> {
 
     /** The Constant DATE_FORMAT. */
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");

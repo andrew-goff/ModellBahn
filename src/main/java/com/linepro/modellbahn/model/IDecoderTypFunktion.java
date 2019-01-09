@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
-import com.linepro.modellbahn.model.keys.DecoderTypFunktionKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderTypFunktionRef;
 import com.linepro.modellbahn.model.refs.IDecoderTypRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(ApiNames.FUNKTION)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.DECODER_TYP,  ApiNames.REIHE,  ApiNames.FUNKTION,  ApiNames.BEZEICHNUNG,  ApiNames.PROGRAMMABLE, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.FUNKTION, description = "Decoder type function mapping - template for Decoder.")
-public interface IDecoderTypFunktion extends IItem<DecoderTypFunktionKey>, IDecoderTypFunktionRef {
+public interface IDecoderTypFunktion extends IItem, IDecoderTypFunktionRef {
 
 
     @JsonGetter(ApiNames.DECODER_TYP)

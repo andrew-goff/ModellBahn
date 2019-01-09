@@ -14,7 +14,7 @@ import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.IKategorie;
 import com.linepro.modellbahn.model.IUnterKategorie;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.rest.util.ApiNames;
@@ -29,7 +29,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.KATEGORIE)
 @Table(name = DBNames.KATEGORIE, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class Kategorie extends AbstractNamedItem<NameKey> implements IKategorie {
+public class Kategorie extends AbstractNamedItem implements IKategorie {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2964561580499221297L;

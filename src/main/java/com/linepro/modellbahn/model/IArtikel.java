@@ -21,7 +21,7 @@ import com.linepro.modellbahn.model.impl.MotorTyp;
 import com.linepro.modellbahn.model.impl.Produkt;
 import com.linepro.modellbahn.model.impl.Steuerung;
 import com.linepro.modellbahn.model.impl.Wahrung;
-import com.linepro.modellbahn.model.keys.ArtikelKey;
+
 import com.linepro.modellbahn.model.refs.IArtikelRef;
 import com.linepro.modellbahn.model.refs.IDecoderRef;
 import com.linepro.modellbahn.model.refs.IKupplungRef;
@@ -47,7 +47,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.ARTIKEL)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.ARTIKEL_ID, ApiNames.BEZEICHNUNG, ApiNames.PRODUKT, ApiNames.KAUFDATUM, ApiNames.WAHRUNG, ApiNames.PREIS, ApiNames.STUCK, ApiNames.STEUERUNG, ApiNames.MOTOR_TYP, ApiNames.LICHT, ApiNames.KUPPLUNG, ApiNames.DECODER, ApiNames.ANMERKUNG, ApiNames.BELADUNG, ApiNames.ABBILDUNG, ApiNames.STATUS, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.ARTIKEL, description = "An article - may differ from product because of modificiations")
-public interface IArtikel extends IItem<ArtikelKey>, IArtikelRef {
+public interface IArtikel extends IItem, IArtikelRef {
 
     @JsonSetter(ApiNames.ARTIKEL_ID)
     void setArtikelId(String artikelId);

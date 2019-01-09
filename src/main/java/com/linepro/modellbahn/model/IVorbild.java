@@ -19,7 +19,7 @@ import com.linepro.modellbahn.model.impl.Antrieb;
 import com.linepro.modellbahn.model.impl.Bahnverwaltung;
 import com.linepro.modellbahn.model.impl.Gattung;
 import com.linepro.modellbahn.model.impl.UnterKategorie;
-import com.linepro.modellbahn.model.keys.VorbildKey;
+
 import com.linepro.modellbahn.model.refs.IAchsfolgRef;
 import com.linepro.modellbahn.model.refs.IAntriebRef;
 import com.linepro.modellbahn.model.refs.IBahnverwaltungRef;
@@ -43,7 +43,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.VORBILD)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.GATTUNG, ApiNames.BEZEICHNUNG, ApiNames.UNTER_KATEGORIE, ApiNames.BAHNVERWALTUNG, ApiNames.HERSTELLER, ApiNames.BAUZEIT, ApiNames.ANZAHL, ApiNames.BETREIBSNUMMER, ApiNames.ANTRIEB, ApiNames.ACHSFOLG, ApiNames.ANFAHRZUGKRAFT, ApiNames.LEISTUNG, ApiNames.DIENSTGEWICHT, ApiNames.GESCHWINDIGKEIT, ApiNames.LANGE, ApiNames.AUSSERDIENST, ApiNames.DMTREIBRAD, ApiNames.DMLAUFRADVORN, ApiNames.DMLAUFRADHINTEN, ApiNames.ZYLINDER, ApiNames.DMZYLINDER, ApiNames.KOLBENHUB, ApiNames.KESSELUEBERDRUCK, ApiNames.ROSTFLAECHE, ApiNames.UEBERHITZERFLAECHE, ApiNames.WASSERVORRAT, ApiNames.VERDAMPFUNG, ApiNames.STEUERUNG, ApiNames.FAHRMOTOREN, ApiNames.MOTORBAUART, ApiNames.LEISTUNGSUBERTRAGUNG, ApiNames.REICHWEITE, ApiNames.KAPAZITAT, ApiNames.KLASSE, ApiNames.SITZPLATZEKL1, ApiNames.SITZPLATZEKL2, ApiNames.SITZPLATZEKL3, ApiNames.SITZPLATZEKL4, ApiNames.AUFBAU, ApiNames.TRIEBKOEPFE, ApiNames.MITTELWAGEN, ApiNames.DREHGESTELLBAUART, ApiNames.ABBILDUNG, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.VORBILD, description = "A real world prototype.")
-public interface IVorbild extends IItem<VorbildKey>, IVorbildRef {
+public interface IVorbild extends IItem, IVorbildRef {
     
     @JsonSetter(ApiNames.GATTUNG)
     @JsonDeserialize(as= Gattung.class)

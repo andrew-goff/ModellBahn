@@ -6,7 +6,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.linepro.modellbahn.model.IZugTyp;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.util.AbstractNamedItem;
 import com.linepro.modellbahn.persistence.DBNames;
 
@@ -19,7 +19,7 @@ import com.linepro.modellbahn.persistence.DBNames;
 @Entity(name = DBNames.ZUG_TYP)
 @Table(name = DBNames.ZUG_TYP, indexes = { @Index(columnList = DBNames.NAME, unique = true) }, uniqueConstraints = {
         @UniqueConstraint(columnNames = { DBNames.NAME }) })
-public class ZugTyp extends AbstractNamedItem<NameKey> implements IZugTyp {
+public class ZugTyp extends AbstractNamedItem implements IZugTyp {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 2290449046107280442L;

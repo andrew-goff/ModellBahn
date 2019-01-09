@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.persistence.impl;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerator.IdKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,12 +31,11 @@ import org.slf4j.Logger;
 import com.google.inject.assistedinject.Assisted;
 import com.linepro.modellbahn.guice.ISessionManagerFactory;
 import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.IdKey;
-import com.linepro.modellbahn.model.keys.ItemKey;
-import com.linepro.modellbahn.model.keys.NameKey;
+
+
+
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.IIdGenerator;
-import com.linepro.modellbahn.persistence.IKey;
 import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.ISessionManager;
 import com.linepro.modellbahn.persistence.util.BusinessKey;
@@ -50,7 +50,7 @@ import com.linepro.modellbahn.util.SelectorsBuilder;
  *
  * @param <E> the element type
  */
-public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
+public abstract class AbstractItemPersister<E extends IItem, K> implements IPersister<E> {
 
     /** The entity manager. */
     private final ISessionManagerFactory sessionManagerFactory;
@@ -86,7 +86,7 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
      * @param entityClass the entity class
      */
     @Inject
-    public ItemPersister(final ISessionManagerFactory sessionManagerFactory, final ILoggerFactory logManager,
+    public AbstractItemPersister(final ISessionManagerFactory sessionManagerFactory, final ILoggerFactory logManager,
             @Assisted final Class<E> entityClass) {
         this.sessionManagerFactory = sessionManagerFactory;
         this.logger = logManager.getLogger(entityClass.getName());
@@ -158,7 +158,7 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
     }
 
     @Override
-    public E update(IKey key, E entity) throws Exception {
+    public E update(K key, E entity) throws Exception {
         return internalUpdate(key, entity, false);
     }
 
@@ -176,7 +176,7 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
      * @throws Exception the exception
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private E internalUpdate(IKey key, E entity, boolean addOrUpdate) throws Exception {
+    private E internalUpdate(Long id, E entity, boolean addOrUpdate) throws Exception {
         ISessionManager session = getSession();
 
         try {
@@ -329,11 +329,6 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
             
             throw e;
        }
-    }
-
-    @Override
-    public E findByKey(Long id, boolean eager) throws Exception {
-        return findById(id, eager);
     }
 
     @Override
@@ -501,7 +496,7 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
      * @throws Exception the exception
      */
     private List<Predicate> getConditions(CriteriaBuilder builder, Root<E> root, E template, Map<String, Selector> selectors,
-                                          Map<String,List<String>> references, CriteriaQuery<?> criteria) throws Exception {
+                                          Map<String,List<String>> references, CriteriaQuery criteria) throws Exception {
         List<Predicate> predicates = new ArrayList<>();
 
         if (template != null) {
@@ -509,7 +504,7 @@ public class ItemPersister<E extends IItem<?>> implements IPersister<E> {
                 Object value = selector.getGetter().invoke(template);
 
                 if (value != null && !(value instanceof Collection)) {
-                    value = value instanceof IItem ? ((IItem<?>) value).getId() : value;
+                    value = value instanceof IItem ? ((IItem) value).getId() : value;
                     Path<Object> field = root.get(selector.getName());
                     Predicate predicate = builder.equal(field, value);
                     predicates.add(predicate);

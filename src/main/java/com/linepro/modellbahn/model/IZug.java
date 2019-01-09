@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.ZugTyp;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.refs.IZugConsistRef;
 import com.linepro.modellbahn.model.refs.IZugRef;
 import com.linepro.modellbahn.model.refs.IZugTypRef;
@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonPropertyOrder({ApiNames.ID, ApiNames.ZUG_TYP, ApiNames.NAMEN, ApiNames.BEZEICHNUNG, ApiNames.DELETED,
         ApiNames.CONSIST, ApiNames.LINKS})
 @ApiModel(value = ApiNames.ZUG, description = "A running train configuration.")
-public interface IZug extends INamedItem<NameKey>, IZugRef {
+public interface IZug extends INamedItem, IZugRef {
 
     /**
      * Gets the typ.

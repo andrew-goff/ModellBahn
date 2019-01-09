@@ -20,7 +20,7 @@ import com.linepro.modellbahn.model.IDecoder;
 import com.linepro.modellbahn.model.IDecoderCV;
 import com.linepro.modellbahn.model.IDecoderTypCV;
 import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.DecoderCVKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.model.validation.CVValue;
 import com.linepro.modellbahn.persistence.DBNames;
@@ -40,7 +40,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Table(name = DBNames.DECODER_CV, indexes = {
         @Index(columnList = DBNames.DECODER_ID + "," + DBNames.CV_ID, unique = true) }, uniqueConstraints = {
                 @UniqueConstraint(columnNames = { DBNames.DECODER_ID, DBNames.CV_ID }) })
-public class DecoderCV extends AbstractItem<DecoderCVKey> implements IDecoderCV {
+public class DecoderCV extends AbstractItem implements IDecoderCV {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 2660599652146536110L;
@@ -142,7 +142,7 @@ public class DecoderCV extends AbstractItem<DecoderCVKey> implements IDecoderCV 
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof DecoderCV) {
             return new CompareToBuilder()
                     .append(getDecoder(), ((DecoderCV) other).getDecoder())

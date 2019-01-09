@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.ILicht;
 import com.linepro.modellbahn.model.impl.Licht;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -46,7 +47,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.LICHT, description = "Licht maintenance")
 @Path(ApiPaths.LICHT)
-public class LichtService extends AbstractItemService<NameKey, Licht> {
+public class LichtService extends AbstractNamedItemService<ILicht> {
 
     public LichtService() {
         super(Licht.class);
@@ -133,7 +134,7 @@ public class LichtService extends AbstractItemService<NameKey, Licht> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            ILicht licht = findLicht(name, false);
+            ILicht licht = getPersister().findByKey(name, false);
 
             if (licht != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.ARTIKEL, new String[] { name }, fileDetail, fileData);
@@ -158,7 +159,7 @@ public class LichtService extends AbstractItemService<NameKey, Licht> {
     @ApiOperation(code = 204, value = "Deletes the picture for a named Licht", response = Licht.class)
     public Response deleteAbbildung(@PathParam(ApiPaths.ID_PARAM_NAME) String name) {
         try {
-            ILicht licht = findLicht(name, false);
+            ILicht licht = getPersister().findByKey(name, false);
 
             if (licht != null && licht.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(licht.getAbbildung());

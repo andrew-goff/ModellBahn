@@ -1,5 +1,10 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IDecoderTypAdressPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypCVPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypPersister;
+import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +41,7 @@ import com.linepro.modellbahn.model.impl.DecoderCV;
 import com.linepro.modellbahn.model.impl.DecoderFunktion;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.Protokoll;
-import com.linepro.modellbahn.model.keys.DecoderKey;
+
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.DecoderCreator;
 import com.linepro.modellbahn.rest.json.Views;
@@ -59,10 +64,14 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.DECODER)
 @Path(ApiPaths.DECODER)
-public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
+public class DecoderService extends AbstractItemService<IDecoder> {
+
+    protected final IDecoderTypPersister decoderTypPersister;
 
     public DecoderService() {
         super(Decoder.class);
+
+        decoderTypPersister = (IDecoderTypPersister) StaticPersisterFactory.get().createPersister(IDecoderTyp.class);
     }
 
     @JsonCreator
@@ -83,49 +92,14 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
     @JsonCreator
     public DecoderAdress createAdress(@JsonProperty(value = ApiNames.ID) Long id,
             @JsonProperty(value = ApiNames.DECODER_ID) String decoderId,
-            @JsonProperty(value = ApiNames.REIHE) Integer reihe,
+            @JsonProperty(value = ApiNames.INDEX) Integer index,
             @JsonProperty(value = ApiNames.ADRESS_TYP) String adressTypStr,
             @JsonProperty(value = ApiNames.ADRESS) Integer adress,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoder decoder = findDecoder(decoderId, false);
+        IDecoder decoder = getPersister().findByKey(decoderId, false);
         AdressTyp adressTyp = AdressTyp.valueOf(adressTypStr);
 
-        DecoderAdress entity = new DecoderAdress(id, decoder, reihe, adressTyp, adress, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
-    @JsonCreator
-    public DecoderCV createCV(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.DECODER_ID) String decoderId,
-            @JsonProperty(value = ApiNames.CV) Integer cvValue,
-            @JsonProperty(value = ApiNames.WERT) Integer wert,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoder decoder = findDecoder(decoderId, false);
-
-        IDecoderTypCV decoderTypCV = findDecoderTypCV(decoder.getDecoderTyp(), cvValue, true);
-
-        DecoderCV entity = new DecoderCV(id, decoder, decoderTypCV, wert, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
-    @JsonCreator
-    public DecoderFunktion createFunktion(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.DECODER_ID) String decoderId,
-            @JsonProperty(value = ApiNames.REIHE) Integer reihe,
-            @JsonProperty(value = ApiNames.FUNKTION) String funktion,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoder decoder = findDecoder(decoderId, false);
-
-        IDecoderTypFunktion decoderTypFunktion = findDecoderTypFunktion(decoder.getDecoderTyp(), reihe, funktion, true);
-
-        DecoderFunktion entity = new DecoderFunktion(id, decoder, decoderTypFunktion, bezeichnung, deleted);
+        DecoderAdress entity = new DecoderAdress(id, decoder, index, adressTyp, adress, deleted);
 
         debug("created: " + entity);
 
@@ -144,7 +118,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         })
     public Response addDecoder(@PathParam(ApiNames.HERSTELLER) String herstellerStr, @PathParam(ApiNames.BESTELL_NR) String bestellNr) {
         try {
-            IDecoderTyp decoderTyp = findDecoderTyp(herstellerStr, bestellNr, true);
+            IDecoderTyp decoderTyp = getDecoderTypPersister().findByKey(herstellerStr, bestellNr, true);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -164,7 +138,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
     @JsonView(Views.Public.class)
     @ApiOperation(value = "Finds a Decoder by decoderId", response = Decoder.class)
     public Response get(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId) {
-        return super.get(new DecoderKey(decoderId));
+        return super.get(decoderId);
     }
 
     @GET
@@ -193,7 +167,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
     @JsonView(Views.Public.class)
     @ApiOperation(code = 202, value = "Updates a Decoder by decoderId", response = Decoder.class)
     public Response update(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId, Decoder entity) {
-        return super.update(new DecoderKey(decoderId), entity);
+        return super.update(decoderId, entity);
     }
 
     @DELETE
@@ -202,7 +176,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
     @JsonView(Views.Public.class)
     @ApiOperation(code = 204, value = "Deletes a Decoder by decoderId", response = Decoder.class)
     public Response delete(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId) {
-        return super.delete(new DecoderKey(decoderId));
+        return super.delete(decoderId);
     }
 
     @GET
@@ -217,7 +191,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         })
     public Response getAdress(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId, @PathParam(ApiPaths.INDEX_PARAM_NAME) Integer index) {
         try {
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -249,7 +223,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         try {
             logPut(decoderId + "/" + index + ": " + adress);
 
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -283,7 +257,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         })
     public Response getCv(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId, @PathParam(ApiPaths.CV_PARAM_NAME) Integer cv) {
         try {
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -316,7 +290,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         try {
             logPut(decoderId + "/" + cv + ": " + wert);
 
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -350,7 +324,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         })
     public Response getFunktion(@PathParam(ApiPaths.DECODER_ID_PARAM_NAME) String decoderId, @PathParam(ApiPaths.REIHE_PARAM_NAME) Integer reihe, @PathParam(ApiPaths.FUNKTION_PARAM_NAME) String funktion) {
         try {
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -383,7 +357,7 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         try {
             logPut(decoderId + "/" + reihe + "/" + funktion + ": " + descirption);
 
-            Decoder decoder = (Decoder) findDecoder(decoderId, true);
+            IDecoder decoder = getPersister().findByKey(decoderId, true);
 
             if (decoder == null) {
                 return getResponse(badRequest(null, "Decoder " + decoderId + " does not exist"));
@@ -442,5 +416,9 @@ public class DecoderService extends AbstractItemService<DecoderKey, Decoder> {
         }
         
         return null;
+    }
+
+    private IDecoderTypPersister getDecoderTypPersister() {
+        return decoderTypPersister;
     }
 }

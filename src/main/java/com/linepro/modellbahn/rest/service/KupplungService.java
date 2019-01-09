@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IKupplung;
 import com.linepro.modellbahn.model.impl.Kupplung;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
 import com.linepro.modellbahn.rest.util.AcceptableMediaTypes;
@@ -46,7 +47,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.KUPPLUNG, description = "Kupplung maintenance")
 @Path(ApiPaths.KUPPLUNG)
-public class KupplungService extends AbstractItemService<NameKey, Kupplung> {
+public class KupplungService extends AbstractNamedItemService<IKupplung> {
 
     public KupplungService() {
         super(Kupplung.class);
@@ -133,7 +134,7 @@ public class KupplungService extends AbstractItemService<NameKey, Kupplung> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IKupplung kupplung = findKupplung(name, false);
+            IKupplung kupplung = getPersister().findByKey(name, false);
 
             if (kupplung != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.ARTIKEL, new String[] { name }, fileDetail, fileData);
@@ -158,7 +159,7 @@ public class KupplungService extends AbstractItemService<NameKey, Kupplung> {
     @ApiOperation(code = 204, value = "Deletes the picture from a named Kupplung", response = Kupplung.class)
     public Response deleteAbbildung(@PathParam(ApiPaths.ID_PARAM_NAME) String name) {
         try {
-            IKupplung kupplung = findKupplung(name, false);
+            IKupplung kupplung = getPersister().findByKey(name, false);
 
             if (kupplung != null && kupplung.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(kupplung.getAbbildung());

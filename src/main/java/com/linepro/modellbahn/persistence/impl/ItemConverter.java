@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author  $Author:$
  * @version $Id:$
  */
-class ItemConverter<E extends IItem<?>> implements Converter {
+class ItemConverter<E extends IItem> implements Converter {
 
     /** The persister. */
     private final IPersister<E> persister;
@@ -36,10 +36,10 @@ class ItemConverter<E extends IItem<?>> implements Converter {
     public <T> T convert(Class<T> type, Object value) {
         try {
             if (StringUtils.isNotBlank(value.toString())) {
-                Class<? extends IItem<?>> entityClass = getPersister().getEntityClass();
+                Class<? extends IItem> entityClass = getPersister().getEntityClass();
 
                 if (entityClass.isAssignableFrom(type)) {
-                    IItem<?> entity = getPersister().findByKey(keyGenerator.getKey(value), false);
+                    IItem entity = getPersister().findByKey(keyGenerator.getKey(value), false);
 
                     if (entity != null) {
                         return (T) entity;

@@ -1,5 +1,9 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IDecoderTypAdressPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypCVPersister;
+import com.linepro.modellbahn.persistence.IDecoderTypFunktionPersister;
+import com.linepro.modellbahn.persistence.INamedItemPersister;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import javax.ws.rs.Consumes;
@@ -28,10 +32,9 @@ import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.DecoderTypAdress;
 import com.linepro.modellbahn.model.impl.DecoderTypCV;
 import com.linepro.modellbahn.model.impl.DecoderTypFunktion;
-import com.linepro.modellbahn.model.keys.DecoderTypKey;
+
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.Konfiguration;
-import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -51,20 +54,27 @@ import io.swagger.annotations.ApiResponses;
  */
 @Api(value = ApiNames.DECODER_TYP, description = "DecoderTyp maintenance")
 @Path(ApiPaths.DECODER_TYP)
-public class DecoderTypService extends AbstractItemService<DecoderTypKey, DecoderTyp> {
+public class DecoderTypService extends AbstractItemService<IDecoderTyp> {
 
-    private final IPersister<DecoderTypAdress> adressPersister;
+    private final INamedItemPersister<IHersteller> herstellerPersister;
 
-    private final IPersister<DecoderTypCV> cvPersister;
+    private final INamedItemPersister<IProtokoll> protokollPersister;
 
-    private final IPersister<DecoderTypFunktion> funktionPersister;
+    private final IDecoderTypAdressPersister adressPersister;
+
+    private final IDecoderTypCVPersister cvPersister;
+
+    private final IDecoderTypFunktionPersister funktionPersister;
 
     public DecoderTypService() {
         super(DecoderTyp.class);
-        
-        adressPersister = StaticPersisterFactory.get().createPersister(DecoderTypAdress.class);
-        cvPersister = StaticPersisterFactory.get().createPersister(DecoderTypCV.class);
-        funktionPersister = StaticPersisterFactory.get().createPersister(DecoderTypFunktion.class);
+
+        herstellerPersister = StaticPersisterFactory.get().createPersister(IHersteller.class);
+        protokollPersister = StaticPersisterFactory.get().createPersister(IProtokoll.class);
+
+        adressPersister = StaticPersisterFactory.get().createPersister(IDecoderTypAdress.class);
+        cvPersister = StaticPersisterFactory.get().createPersister(IDecoderTypCV.class);
+        funktionPersister = StaticPersisterFactory.get().createPersister(IDecoderTypFunktion.class);
     }
 
     @JsonCreator
@@ -76,8 +86,8 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
             @JsonProperty(value = ApiNames.GERAUSCH) Boolean sound,
             @JsonProperty(value = ApiNames.KONFIGURATION) String konfigurationStr,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IHersteller hersteller = findHersteller(herstellerStr, false);
-        IProtokoll protokoll = findProtokoll(protokollStr, false);
+        IHersteller hersteller = getHerstellerPersister().findByKey(herstellerStr, false);
+        IProtokoll protokoll = getProtokollPersister().findByKey(protokollStr, false);
         Konfiguration konfiguration = Konfiguration.valueOf(konfigurationStr);
 
         DecoderTyp entity = new DecoderTyp(id, hersteller, protokoll, name, bezeichnung, sound, konfiguration,
@@ -97,7 +107,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
             @JsonProperty(value = ApiNames.SPAN) Integer span,
             @JsonProperty(value = ApiNames.WERKSEINSTELLUNG) Integer werkeinstellung,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoderTyp decoderTyp = findDecoderTyp(herstellerStr, bestellNr, false);
+        IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
         AdressTyp adressTyp = AdressTyp.valueOf(adressTypStr);
         
         DecoderTypAdress entity = new DecoderTypAdress(id, decoderTyp, index, adressTyp, span, werkeinstellung, deleted);
@@ -117,7 +127,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
             @JsonProperty(value = ApiNames.MINIMAL) Integer max,
             @JsonProperty(value = ApiNames.MAXIMAL) Integer min,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoderTyp decoderTyp = findDecoderTyp(herstellerStr, bestellNr, false);
+        IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
         DecoderTypCV entity = new DecoderTypCV(id, decoderTyp, cv, bezeichnung, cv, min, max, deleted);
 
@@ -135,7 +145,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
             @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
             @JsonProperty(value = ApiNames.PROGRAMMABLE) Boolean programmable,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IDecoderTyp decoderTyp = findDecoderTyp(herstellerStr, bestellNr, false);
+        IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
         DecoderTypFunktion entity = new DecoderTypFunktion(id, decoderTyp, reihe, funktion, bezeichnung, programmable,
                 deleted);
@@ -153,7 +163,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response get(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr,
             @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.get(new DecoderTypKey(findHersteller(herstellerStr, false), bestellNr));
+            return super.get(herstellerStr, bestellNr);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -201,7 +211,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response update(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr,
             @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr, DecoderTyp entity) {
         try {
-            return super.update(new DecoderTypKey(findHersteller(herstellerStr, false), bestellNr), entity);
+            return super.update(herstellerStr, bestellNr, entity);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -220,7 +230,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response delete(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr,
             @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.delete(new DecoderTypKey(findHersteller(herstellerStr, false), bestellNr));
+            return super.delete(herstellerStr, bestellNr);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -238,13 +248,8 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response getAdress(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.INDEX_PARAM_NAME) Integer index) {
         try {
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, true);
-
-            if (decoderTyp == null) {
-                return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
-            }
-
-            IDecoderTypAdress decoderTypAdress = findDecoderTypAdress(decoderTyp, index, true);
+            IDecoderTypAdress decoderTypAdress = getAdressPersister()
+                .findByKey(herstellerStr, bestellNr, index, true);
 
             if (decoderTypAdress != null) {
                 return getResponse(ok(), decoderTypAdress, true, true);
@@ -271,7 +276,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPost(herstellerStr + "/" + bestellNr + "/" + decoderTypAdress);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -303,16 +308,17 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPut(herstellerStr + "/" + bestellNr + "/" + index + ": " + newDecoderTypAdress);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
-            IDecoderTypAdress decoderTypAdress = findDecoderTypAdress(decoderTyp, index, true);
+            IDecoderTypAdress decoderTypAdress = getAdressPersister()
+                .findByKey(herstellerStr, bestellNr, index, true);
 
             if (decoderTypAdress == null) {
-                return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
+                return getResponse(badRequest(null, "DecoderTypAdress " + herstellerStr + "/" + bestellNr + " does not exist"));
             } else if (newDecoderTypAdress.getDecoderTyp() == null) {
                 newDecoderTypAdress.setDecoderTyp(decoderTyp);
             } else if (!newDecoderTypAdress.getDecoderTyp().equals(decoderTyp)) {
@@ -340,13 +346,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response deleteAdress(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.INDEX_PARAM_NAME) Integer index) {
         try {
-            DecoderTypAdress decoderTypAdress = (DecoderTypAdress) findDecoderTypAdress(herstellerStr, bestellNr, index, true);
+            IDecoderTypAdress decoderTypAdress = getAdressPersister()
+                .findByKey(herstellerStr, bestellNr, index, true);
 
             if (decoderTypAdress == null) {
                 return getResponse(badRequest(null, "DecoderTypAdress " + herstellerStr + "/" + bestellNr + "/" + index + " does not exist"));
             }
 
-            DecoderTyp decoderTyp = (DecoderTyp) decoderTypAdress.getDecoderTyp();
+            IDecoderTyp decoderTyp = decoderTypAdress.getDecoderTyp();
 
             decoderTyp.removeAdress(decoderTypAdress);
 
@@ -372,13 +379,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response getCV(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.CV_PARAM_NAME) Integer cv) {
         try {
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, true);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, true);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
-            IDecoderTypCV decoderTypCV = findDecoderTypCV(decoderTyp, cv, true);
+            IDecoderTypCV decoderTypCV = getCvPersister()
+                .findByKey(herstellerStr, bestellNr, cv, true);
 
             if (decoderTypCV != null) {
                 return getResponse(ok(), decoderTypCV, true, true);
@@ -405,7 +413,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPost(herstellerStr + "/" + bestellNr + "/" + decoderTypCV);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -437,13 +445,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPut(herstellerStr + "/" + bestellNr + "/" + cv + ": " + newDecoderTypCV);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
-            IDecoderTypCV decoderTypCV = findDecoderTypCV(decoderTyp, cv, true);
+            IDecoderTypCV decoderTypCV = getCvPersister()
+                .findByKey(herstellerStr, bestellNr, cv, true);
 
             if (decoderTypCV == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -481,13 +490,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response deleteCV(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.CV_PARAM_NAME) Integer cv) {
         try {
-            DecoderTypCV decoderTypCV = (DecoderTypCV) findDecoderTypCV(herstellerStr, bestellNr, cv, true);
+            IDecoderTypCV decoderTypCV = getCvPersister()
+                .findByKey(herstellerStr, bestellNr, cv, true);
 
             if (decoderTypCV == null) {
                 return getResponse(badRequest(null, "DecoderTypCV " + herstellerStr + "/" + bestellNr + "/" + cv + " does not exist"));
             }
 
-            DecoderTyp decoderTyp = (DecoderTyp) decoderTypCV.getDecoderTyp();
+            IDecoderTyp decoderTyp = decoderTypCV.getDecoderTyp();
 
             decoderTyp.removeCV(decoderTypCV);
 
@@ -513,13 +523,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response getFunktion(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.REIHE_PARAM_NAME) Integer reihe, @PathParam(ApiPaths.FUNKTION_PARAM_NAME) String funktion) {
         try {
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, true);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, true);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
-            IDecoderTypFunktion decoderTypFunktion = findDecoderTypFunktion(decoderTyp, reihe, funktion, true);
+            IDecoderTypFunktion decoderTypFunktion = getFunktionPersister()
+                .findByKey(herstellerStr, bestellNr, reihe, funktion, true);
 
             if (decoderTypFunktion != null) {
                 return getResponse(ok(), decoderTypFunktion, true, true);
@@ -546,7 +557,7 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPost(herstellerStr + "/" + bestellNr + "/" + decoderTypFunktion);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -581,13 +592,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         try {
             logPost(herstellerStr + "/" + bestellNr + "/" + reihe + "/" + funktion + ": " + newDecoderTypFunktion);
 
-            DecoderTyp decoderTyp = (DecoderTyp) findDecoderTyp(herstellerStr, bestellNr, false);
+            IDecoderTyp decoderTyp = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
-            IDecoderTypFunktion decoderTypFunktion = findDecoderTypFunktion(decoderTyp, reihe, funktion, true);
+            IDecoderTypFunktion decoderTypFunktion = getFunktionPersister()
+                .findByKey(herstellerStr, bestellNr, reihe, funktion, true);
 
             if (decoderTypFunktion == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -618,13 +630,14 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
     public Response deleteFunktion(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
             @PathParam(ApiPaths.REIHE_PARAM_NAME) Integer reihe, @PathParam(ApiPaths.FUNKTION_PARAM_NAME) String funktion) {
         try {
-            DecoderTypFunktion decoderTypFunktion = (DecoderTypFunktion) findDecoderTypFunktion(herstellerStr, bestellNr, reihe, funktion, true);
+            IDecoderTypFunktion decoderTypFunktion = getFunktionPersister()
+                .findByKey(herstellerStr, bestellNr, reihe, funktion, true);
 
             if (decoderTypFunktion == null) {
                 return getResponse(badRequest(null, "DecoderTypFunktion " + herstellerStr + "/" + bestellNr + "/" + reihe + "/" + funktion + " does not exist"));
             }
 
-            DecoderTyp decoderTyp = (DecoderTyp) decoderTypFunktion.getDecoderTyp();
+            IDecoderTyp decoderTyp = decoderTypFunktion.getDecoderTyp();
 
             decoderTyp.removeFunktion(decoderTypFunktion);
 
@@ -638,16 +651,27 @@ public class DecoderTypService extends AbstractItemService<DecoderTypKey, Decode
         }
     }
 
-    private IPersister<DecoderTypAdress> getAdressPersister() {
+    private IDecoderTypAdressPersister getAdressPersister() {
         return adressPersister;
     }
 
-    private IPersister<DecoderTypCV> getCVPersister() {
-        return cvPersister;
+    private IDecoderTypCVPersister getCVPersister() {
+        return getCvPersister();
     }
 
-    private IPersister<DecoderTypFunktion> getFunktionPersister() {
+    private IDecoderTypFunktionPersister getFunktionPersister() {
         return funktionPersister;
     }
 
+  public INamedItemPersister<IHersteller> getHerstellerPersister() {
+    return herstellerPersister;
+  }
+
+  public INamedItemPersister<IProtokoll> getProtokollPersister() {
+    return protokollPersister;
+  }
+
+  public IDecoderTypCVPersister getCvPersister() {
+    return cvPersister;
+  }
 }

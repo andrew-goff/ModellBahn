@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.Wahrung;
-import com.linepro.modellbahn.model.keys.NameKey;
+
 import com.linepro.modellbahn.model.refs.ILandRef;
 import com.linepro.modellbahn.model.refs.IWahrungRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.LAND)
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.WAHRUNG, ApiNames.NAMEN, ApiNames.BEZEICHNUNG, ApiNames.DELETED, ApiNames.LINKS })
 @ApiModel(value = ApiNames.LAND, description = "Country.")
-public interface ILand extends INamedItem<NameKey>, ILandRef {
+public interface ILand extends INamedItem, ILandRef {
 
     /**
      * Gets the wahrung.

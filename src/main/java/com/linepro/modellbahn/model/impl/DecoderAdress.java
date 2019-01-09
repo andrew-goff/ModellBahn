@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.Range;
 import com.linepro.modellbahn.model.IDecoder;
 import com.linepro.modellbahn.model.IDecoderAdress;
 import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.DecoderAdressKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.validation.Adress;
@@ -47,7 +47,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Table(name =  DBNames.DECODER_ADRESS, indexes = { @Index(columnList = DBNames.DECODER_ID + "," + DBNames.INDEX, unique = true) },
         uniqueConstraints = { @UniqueConstraint(columnNames = { DBNames.DECODER_ID, DBNames.INDEX }) })
 @Adress
-public class DecoderAdress extends AbstractItem<DecoderAdressKey> implements IDecoderAdress {
+public class DecoderAdress extends AbstractItem implements IDecoderAdress {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -1845658968133212205L;
@@ -140,7 +140,7 @@ public class DecoderAdress extends AbstractItem<DecoderAdressKey> implements IDe
      }
 
      @Override
-     public int compareTo(IItem<?> other) {
+     public int compareTo(IItem other) {
          if (other instanceof DecoderAdress) {
              return new CompareToBuilder()
                      .append(getDecoder(), ((DecoderAdress) other).getDecoder())

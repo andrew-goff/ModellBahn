@@ -28,8 +28,8 @@ import com.linepro.modellbahn.util.ToStringBuilder;
  * @version $Id$
  */
 @MappedSuperclass
-public abstract class AbstractNamedItem<K extends IKey> extends AbstractItem<K> implements
-    INamedItem<K>, Serializable {
+public abstract class AbstractNamedItem extends AbstractItem implements
+    INamedItem, Serializable {
 
   /**
    * The Constant serialVersionUID.
@@ -109,10 +109,10 @@ public abstract class AbstractNamedItem<K extends IKey> extends AbstractItem<K> 
   }
 
   @Override
-  public int compareTo(IItem<?> other) {
+  public int compareTo(IItem other) {
     if (other instanceof AbstractNamedItem) {
       return new CompareToBuilder()
-          .append(getName(), ((AbstractNamedItem<?>) other).getName())
+          .append(getName(), ((AbstractNamedItem) other).getName())
           .toComparison();
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractNamedItem<K extends IKey> extends AbstractItem<K> 
       return false;
     }
 
-    AbstractNamedItem<?> other = (AbstractNamedItem<?>) obj;
+    AbstractNamedItem other = (AbstractNamedItem) obj;
 
     return new EqualsBuilder()
         .append(getName(), other.getName())

@@ -20,7 +20,7 @@ import com.linepro.modellbahn.model.IDecoder;
 import com.linepro.modellbahn.model.IDecoderFunktion;
 import com.linepro.modellbahn.model.IDecoderTypFunktion;
 import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.DecoderFunktionKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.util.BusinessKey;
@@ -37,7 +37,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Entity(name = DBNames.DECODER_FUNKTION)
 @Table(name = DBNames.DECODER_FUNKTION, indexes = { @Index(columnList = DBNames.DECODER_ID + "," + DBNames.FUNKTION_ID, unique = true) },
        uniqueConstraints = { @UniqueConstraint(columnNames = { DBNames.DECODER_ID, DBNames.FUNKTION_ID })})
-public class DecoderFunktion extends AbstractItem<DecoderFunktionKey> implements IDecoderFunktion {
+public class DecoderFunktion extends AbstractItem implements IDecoderFunktion {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -3254516717556070251L;
@@ -126,7 +126,7 @@ public class DecoderFunktion extends AbstractItem<DecoderFunktionKey> implements
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof DecoderFunktion) {
             return new CompareToBuilder()
                     .append(getDecoder(), ((DecoderFunktion) other).getDecoder())

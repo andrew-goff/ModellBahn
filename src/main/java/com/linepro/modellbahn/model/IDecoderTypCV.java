@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.DecoderTyp;
-import com.linepro.modellbahn.model.keys.DecoderTypCVKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderTypCVRef;
 import com.linepro.modellbahn.model.refs.IDecoderTypRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.CV)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.DECODER_TYP,  ApiNames.CV,  ApiNames.BEZEICHNUNG,  ApiNames.MINIMAL,  ApiNames.MAXIMAL,  ApiNames.WERKSEINSTELLUNG, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.CV, description = "Decoder type CV - template for Decoder.")
-public interface IDecoderTypCV extends IItem<DecoderTypCVKey>, IDecoderTypCVRef {
+public interface IDecoderTypCV extends IItem, IDecoderTypCVRef {
 
     @JsonGetter(ApiNames.DECODER_TYP)
     @JsonView(Views.DropDown.class)

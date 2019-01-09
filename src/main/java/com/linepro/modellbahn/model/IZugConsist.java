@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.linepro.modellbahn.model.impl.Artikel;
 import com.linepro.modellbahn.model.impl.Zug;
-import com.linepro.modellbahn.model.keys.ZugConsistKey;
+
 import com.linepro.modellbahn.model.refs.IZugConsistRef;
 import com.linepro.modellbahn.model.refs.IZugRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
 @JsonRootName(value = ApiNames.CONSIST)
 @JsonPropertyOrder({ ApiNames.ID, ApiNames.ZUG, ApiNames.POSITION, ApiNames.ARTIKEL, ApiNames.DELETED, ApiNames.LINKS })
 @ApiModel(value = ApiNames.CONSIST, description = "Rolling stock by poisition in a train.")
-public interface IZugConsist extends IItem<ZugConsistKey>, IZugConsistRef {
+public interface IZugConsist extends IItem, IZugConsistRef {
 
     @JsonGetter(ApiNames.ZUG)
     @JsonView(Views.DropDown.class)

@@ -7,7 +7,6 @@ package com.linepro.modellbahn.model;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.linepro.modellbahn.persistence.IKey;
 import com.linepro.modellbahn.rest.util.ApiNames;
 
 /**
@@ -16,7 +15,7 @@ import com.linepro.modellbahn.rest.util.ApiNames;
  * @version  $Id$
  */
 @JsonPropertyOrder({ApiNames.ID,ApiNames.NAMEN,ApiNames.BEZEICHNUNG,ApiNames.DELETED, ApiNames.LINKS})
-public interface INamedItem<K extends IKey> extends IItem<K> {
+public interface INamedItem extends IItem {
 
     /**
      * Sets the name.

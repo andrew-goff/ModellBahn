@@ -1,5 +1,7 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.model.IProduktTeil;
+import com.linepro.modellbahn.persistence.IProduktTeilPersister;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,7 +44,7 @@ import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.Produkt;
 import com.linepro.modellbahn.model.impl.ProduktTeil;
 import com.linepro.modellbahn.model.impl.UnterKategorie;
-import com.linepro.modellbahn.model.keys.ProduktKey;
+
 import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
@@ -67,14 +69,14 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.PRODUKT, description = "Produkt maintenance")
 @Path(ApiPaths.PRODUKT)
-public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
+public class ProduktService extends AbstractItemService<IProdukt> {
 
-    private final IPersister<ProduktTeil> teilPersister;
+    private final IProduktTeilPersister teilPersister;
     
     public ProduktService() {
         super(Produkt.class);
 
-        teilPersister = StaticPersisterFactory.get().createPersister(ProduktTeil.class);
+        teilPersister = StaticPersisterFactory.get().createProduktTeilPersister();
     }
 
     @JsonCreator
@@ -168,7 +170,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(value = "Finds a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response get(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.get(new ProduktKey(findHersteller(herstellerStr, false), bestellNr));
+            return super.get(herstellerStr, bestellNr);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -231,7 +233,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(code = 202, value = "Updates a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response update(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr, Produkt entity) {
         try {
-            return super.update(new ProduktKey(findHersteller(herstellerStr, false), bestellNr), entity);
+            return super.update(herstellerStr, bestellNr, entity);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -244,7 +246,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(code = 204, value = "Deletes a Produkt by hersteller and bestell nr")
     public Response delete(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.delete(new ProduktKey(findHersteller(herstellerStr, false), bestellNr));
+            return super.delete(herstellerStr, bestellNr);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -260,14 +262,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
         try {
             logPost(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-            Produkt produkt = (Produkt) findProdukt(herstellerStr, bestellNr, true);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, true);
 
             if (produkt == null) {
                 return getResponse(badRequest(null, "Produkt " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
             
-            Produkt teil =  (Produkt) findProdukt(teilHerstellerStr, teilBestellNr, true);
+            IProdukt teil =  getPersister().findByKey(teilHerstellerStr, teilBestellNr, true);
 
             if (teil == null) {
                 return getResponse(badRequest(null, "Produkt " + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
@@ -275,7 +277,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
 
             // TODO: check for cycles
 
-            ProduktTeil produktTeil = new ProduktTeil(null, produkt, teil, 1, false);
+            IProduktTeil produktTeil = new ProduktTeil(null, produkt, teil, 1, false);
 
             produkt.addTeil(produktTeil);
 
@@ -297,7 +299,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
         try {
             logPut(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-                ProduktTeil produktTeil = findProduktTeil(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
+            IProduktTeil produktTeil = getTeilPersister().findByKey(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
 
             if (produktTeil == null) {
                 return getResponse(badRequest(null, "ProduktTeil " + herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
@@ -325,13 +327,13 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
         try {
             logDelete(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-            ProduktTeil produktTeil = findProduktTeil(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
+            IProduktTeil produktTeil = getTeilPersister().findByKey(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
 
             if (produktTeil == null) {
-                return getResponse(badRequest(null, "ProduktTeil " + herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
+                return getResponse(badRequest(null, "IProduktTeil " + herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
             }
 
-            Produkt produkt = (Produkt) produktTeil.getProdukt();
+            IProdukt produkt = produktTeil.getProdukt();
 
             produkt.removeTeil(produktTeil);
 
@@ -361,14 +363,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
 
                 produkt.setAbbildung(file);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -386,14 +388,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(code = 204, value = "Deletes the picture for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteAbbildung(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getAbbildung());
 
                 produkt.setAbbildung(null);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -420,14 +422,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
 
                 produkt.setAnleitungen(file);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -445,14 +447,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(code = 204, value = "Deletes the instructions for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteAnleitungen(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getAnleitungen());
 
                 produkt.setAnleitungen(null);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -479,14 +481,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
 
                 produkt.setExplosionszeichnung(file);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -504,14 +506,14 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
     @ApiOperation(code = 204, value = "Deletes the drawing for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteExplosionszeichnung(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
+            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getExplosionszeichnung());
 
                 produkt.setExplosionszeichnung(null);
 
-                getPersister().update((Produkt) produkt);
+                getPersister().update(produkt);
 
                 return getResponse(ok(produkt));
             }
@@ -522,7 +524,7 @@ public class ProduktService extends AbstractItemService<ProduktKey, Produkt> {
         return getResponse(notFound());
     }
 
-    private IPersister<ProduktTeil> getTeilPersister() {
+    private IPersister<IProduktTeil> getTeilPersister() {
         return teilPersister;
     }
 }

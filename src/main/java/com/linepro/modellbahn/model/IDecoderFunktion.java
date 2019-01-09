@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.linepro.modellbahn.model.keys.DecoderFunktionKey;
+
 import com.linepro.modellbahn.model.refs.IDecoderFunktionRef;
 import com.linepro.modellbahn.model.refs.IDecoderRef;
 import com.linepro.modellbahn.rest.json.Views;
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonRootName(value = ApiNames.FUNKTION)
 @JsonPropertyOrder({ApiNames.ID, ApiNames.DECODER, ApiNames.FUNKTION,  ApiNames.BEZEICHNUNG, ApiNames.DELETED, ApiNames.LINKS})
 @ApiModel(value = ApiNames.FUNKTION, description = "Decoder function mapping.")
-public interface IDecoderFunktion extends IItem<DecoderFunktionKey>, IDecoderFunktionRef {
+public interface IDecoderFunktion extends IItem, IDecoderFunktionRef {
 
     @JsonGetter(ApiNames.DECODER)
     @JsonView(Views.DropDown.class)

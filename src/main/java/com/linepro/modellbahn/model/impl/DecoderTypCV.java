@@ -21,7 +21,7 @@ import org.hibernate.validator.constraints.Range;
 import com.linepro.modellbahn.model.IDecoderTyp;
 import com.linepro.modellbahn.model.IDecoderTypCV;
 import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.DecoderTypCVKey;
+
 import com.linepro.modellbahn.model.util.AbstractItem;
 import com.linepro.modellbahn.model.validation.CVValue;
 import com.linepro.modellbahn.persistence.DBNames;
@@ -40,7 +40,7 @@ import com.linepro.modellbahn.util.ToStringBuilder;
 @Table(name = DBNames.DECODER_TYP_CV, indexes = { @Index(columnList = DBNames.DECODER_TYP_ID +"," + DBNames.CV, unique = true),
         @Index(columnList = DBNames.DECODER_TYP_ID), @Index(columnList = DBNames.CV) }, uniqueConstraints = {
                 @UniqueConstraint(columnNames = { DBNames.DECODER_TYP_ID, DBNames.CV }) })
-public class DecoderTypCV extends AbstractItem<DecoderTypCVKey> implements IDecoderTypCV {
+public class DecoderTypCV extends AbstractItem implements IDecoderTypCV {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -5202372019371973750L;
@@ -183,7 +183,7 @@ public class DecoderTypCV extends AbstractItem<DecoderTypCVKey> implements IDeco
     }
 
     @Override
-    public int compareTo(IItem<?> other) {
+    public int compareTo(IItem other) {
         if (other instanceof DecoderTypCV) {
             return new CompareToBuilder()
                     .append(getDecoderTyp(), ((DecoderTypCV) other).getDecoderTyp())
