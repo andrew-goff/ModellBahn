@@ -48,17 +48,9 @@ public class PersisterFactory implements IPersisterFactory {
         if (persister == null) {
             persister = new ItemPersister<>(sessionManagerFactory, logManager, entityClass);
             
-            registerConverter(persister, entityClass);
-
             persisters.put(entityClass, persister);
         }
         
         return persister;
-    }
-    
-    private void registerConverter(IPersister<?> persister, Class<?> entityClass) {
-        if (INamedItem.class.isAssignableFrom(entityClass)) {
-            ConvertUtils.register(new NamedItemConverter(persister), entityClass);
-        }
     }
 }

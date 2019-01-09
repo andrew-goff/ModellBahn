@@ -1,12 +1,12 @@
 package com.linepro.modellbahn.persistence.impl;
 
+import com.linepro.modellbahn.model.IItem;
+import com.linepro.modellbahn.persistence.IKey;
+import com.linepro.modellbahn.persistence.IKeyGenerator;
+import com.linepro.modellbahn.persistence.IPersister;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
 import org.apache.commons.lang3.StringUtils;
-
-import com.linepro.modellbahn.model.IItem;
-import com.linepro.modellbahn.model.keys.NameKey;
-import com.linepro.modellbahn.persistence.IPersister;
 
 /**
  * NamedItemConverter.
@@ -14,18 +14,21 @@ import com.linepro.modellbahn.persistence.IPersister;
  * @author  $Author:$
  * @version $Id:$
  */
-class NamedItemConverter implements Converter {
-    
+class ItemConverter<E extends IItem<?>> implements Converter {
+
     /** The persister. */
-    private final IPersister<?> persister;
-    
+    private final IPersister<E> persister;
+
+    private final IKeyGenerator keyGenerator;
+
     /**
      * Instantiates a new named item converter.
      *
      * @param persister the persister
      */
-    public NamedItemConverter(IPersister<?> persister) {
+    public ItemConverter(IPersister<E> persister, IKeyGenerator keyGenerator) {
         this.persister = persister;
+        this.keyGenerator = keyGenerator;
     }
 
     @SuppressWarnings("unchecked")
@@ -36,7 +39,7 @@ class NamedItemConverter implements Converter {
                 Class<? extends IItem<?>> entityClass = getPersister().getEntityClass();
 
                 if (entityClass.isAssignableFrom(type)) {
-                    IItem<?> entity = getPersister().findByKey(new NameKey(value.toString()), false);
+                    IItem<?> entity = getPersister().findByKey(keyGenerator.getKey(value), false);
 
                     if (entity != null) {
                         return (T) entity;
@@ -54,7 +57,7 @@ class NamedItemConverter implements Converter {
         return null;
     }
 
-    private IPersister<?> getPersister() {
+    private IPersister<E> getPersister() {
         return persister;
     }
 }
