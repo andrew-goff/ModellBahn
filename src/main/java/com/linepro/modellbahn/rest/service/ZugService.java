@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IZugConsistKey;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,7 +25,7 @@ import com.linepro.modellbahn.model.IZugTyp;
 import com.linepro.modellbahn.model.impl.Zug;
 import com.linepro.modellbahn.model.impl.ZugConsist;
 import com.linepro.modellbahn.persistence.INamedItemPersister;
-import com.linepro.modellbahn.persistence.IPersister
+import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.IZugConsistPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
@@ -51,14 +52,14 @@ public class ZugService extends AbstractItemService<IZug,String> {
 
     private final IPersister<IZugTyp,String> zugTypPersister;
 
-    private final IZugConsistPersister consistPersister;
+    private final IPersister<IZugConsist, IZugConsistKey> consistPersister;
 
     public ZugService() {
         super(Zug.class);
 
         artikelPersister = StaticPersisterFactory.get().createPersister(IArtikel.class);
         zugTypPersister = StaticPersisterFactory.get().createPersister(IZugTyp.class);
-        consistPersister = (IZugConsistPersister) StaticPersisterFactory.get().createPersister(IZugConsist.class);
+        consistPersister = StaticPersisterFactory.get().createPersister(IZugConsist.class);
     }
 
     @JsonCreator
@@ -190,7 +191,7 @@ public class ZugService extends AbstractItemService<IZug,String> {
         try {
             logPost(zugStr + "/" + position + "?" + artikelId);
 
-            IZugConsist consist = getConsistPersister().findByKey(zugStr, position, true);
+            IZugConsist consist = findZugConsist(zugStr, position);
 
             if (consist == null) {
                 return getResponse(badRequest(null, "ZugConsist " + zugStr + "/" + position + " does not exist"));
@@ -219,7 +220,7 @@ public class ZugService extends AbstractItemService<IZug,String> {
     @ApiOperation(code = 204, value = "Removes a vehicle from a named Zug")
     public Response deleteConsist(@PathParam(ApiPaths.ZUG_PARAM_NAME) String zugStr, @PathParam(ApiPaths.POSITION_PARAM_NAME) Integer position) {
         try {
-            IZugConsist zugConsist = getConsistPersister().findByKey(zugStr, position, true);
+            IZugConsist zugConsist = findZugConsist(zugStr, position);
 
             if (zugConsist == null) {
                 return getResponse(badRequest(null, "ZugConsist " + zugStr + "/" + position + " does not exist"));
@@ -240,7 +241,20 @@ public class ZugService extends AbstractItemService<IZug,String> {
         }
     }
 
-    private IZugConsistPersister getConsistPersister() {
+    private IZugConsist findZugConsist(@PathParam(ApiPaths.ZUG_PARAM_NAME) String zugStr,
+        @PathParam(ApiPaths.POSITION_PARAM_NAME) Integer position) throws Exception {
+        return getConsistPersister().findByKey(new IZugConsistKey() {
+            public String getZug() {
+                return zugStr;
+            }
+
+            public Integer getPosition() {
+                return position;
+            }
+        }, true);
+    }
+
+    private IPersister<IZugConsist, IZugConsistKey> getConsistPersister() {
         return consistPersister;
     }
 
@@ -248,7 +262,7 @@ public class ZugService extends AbstractItemService<IZug,String> {
         return artikelPersister;
     }
 
-    public INamedItemPersister<IZugTyp> getZugTypPersister() {
+    public IPersister<IZugTyp, String> getZugTypPersister() {
         return zugTypPersister;
     }
 }

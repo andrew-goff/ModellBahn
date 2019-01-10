@@ -1,7 +1,7 @@
 package com.linepro.modellbahn.rest.service;
 
 import com.linepro.modellbahn.model.IZugTyp;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.ZUG_TYP, description = "ZugTyp maintenance")
 @Path(ApiPaths.ZUG_TYP)
-public class ZugTypService extends AbstractNamedItemService<IZugTyp> {
+public class ZugTypService extends AbstractItemService<IZugTyp, String> {
 
     public ZugTypService() {
         super(ZugTyp.class);

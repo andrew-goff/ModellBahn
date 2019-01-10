@@ -1,6 +1,8 @@
 package com.linepro.modellbahn.rest.service;
 
 import com.linepro.modellbahn.model.IProduktTeil;
+import com.linepro.modellbahn.persistence.IProduktKey;
+import com.linepro.modellbahn.persistence.IProduktTeilKey;
 import com.linepro.modellbahn.persistence.IProduktTeilPersister;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -69,14 +71,42 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.PRODUKT, description = "Produkt maintenance")
 @Path(ApiPaths.PRODUKT)
-public class ProduktService extends AbstractItemService<IProdukt> {
+public class ProduktService extends AbstractItemService<IProdukt, IProduktKey> {
 
-    private final IProduktTeilPersister teilPersister;
-    
+    private final IPersister<IProduktTeil, IProduktTeilKey> teilPersister;
+    private final IPersister<IHersteller, String>  herstellerPersister;
+    private final IPersister<IMassstab, String>  massstabPersister;
+    private final IPersister<ISpurweite, String>  spurweitePersister;
+    private final IPersister<IEpoch, String>  epochPersister;
+    private final IPersister<IBahnverwaltung, String>  bahnverwaltungPersister;
+    private final IPersister<IGattung, String>  gattungPersister;
+    private final IPersister<IVorbild, String>  vorbildPersister;
+    private final IPersister<IAchsfolg, String>  achsfolgPersister;
+    private final IPersister<ISonderModell, String>  sondermodellPersister;
+    private final IPersister<IAufbau, String>  aufbauPersister;
+    private final IPersister<ILicht, String>  lichtPersister;
+    private final IPersister<IKupplung, String>  kupplungPersister;
+    private final IPersister<ISteuerung, String>  steuerungPersister;
+    private final IPersister<IMotorTyp, String>  motorTypPersister;
+
     public ProduktService() {
         super(Produkt.class);
 
-        teilPersister = StaticPersisterFactory.get().createProduktTeilPersister();
+        teilPersister = StaticPersisterFactory.get().createPersister(IProduktTeil.class);
+        herstellerPersister = StaticPersisterFactory.get().createPersister(IHersteller .class);
+        massstabPersister = StaticPersisterFactory.get().createPersister(IMassstab .class);
+        spurweitePersister = StaticPersisterFactory.get().createPersister(ISpurweite .class);
+        epochPersister = StaticPersisterFactory.get().createPersister(IEpoch .class);
+        bahnverwaltungPersister = StaticPersisterFactory.get().createPersister(IBahnverwaltung .class);
+        gattungPersister = StaticPersisterFactory.get().createPersister(IGattung .class);
+        vorbildPersister = StaticPersisterFactory.get().createPersister(IVorbild .class);
+        achsfolgPersister = StaticPersisterFactory.get().createPersister(IAchsfolg .class);
+        sondermodellPersister= StaticPersisterFactory.get().createPersister(ISonderModell .class);
+        aufbauPersister = StaticPersisterFactory.get().createPersister(IAufbau .class);
+        lichtPersister= StaticPersisterFactory.get().createPersister(ILicht .class);
+        kupplungPersister = StaticPersisterFactory.get().createPersister(IKupplung .class);
+        steuerungPersister = StaticPersisterFactory.get().createPersister(ISteuerung .class);
+        motorTypPersister = StaticPersisterFactory.get().createPersister(IMotorTyp .class);
     }
 
     @JsonCreator
@@ -105,20 +135,20 @@ public class ProduktService extends AbstractItemService<IProdukt> {
             @JsonProperty(value = ApiNames.LANGE) BigDecimal lange,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
         // Just see if Jackson can work out the embedded objects...
-        IHersteller hersteller = findHersteller(herstellerStr, false);
-        IMassstab massstab = findMassstab(massstabStr, false);
-        ISpurweite spurweite = findSpurweite(spurweiteStr, false);
-        IEpoch epoch = findEpoch(epochStr, false);
-        IBahnverwaltung bahnverwaltung = findBahnverwaltung(bahnverwaltungStr, false);
-        IGattung gattung = findGattung(gattungStr, false);
-        IVorbild vorbild = findVorbild(gattungStr, false);
-        IAchsfolg achsfolg = findAchsfolg(achsfolgStr, false);
-        ISonderModell sondermodell = findSonderModell(sondermodellStr, false);
-        IAufbau aufbau = findAufbau(aufbauStr, false);
-        ILicht licht = findLicht(lichtStr, false);
-        IKupplung kupplung = findKupplung(kupplungStr, false);
-        ISteuerung steuerung = findSteuerung(steuerungStr, false);
-        IMotorTyp motorTyp = findMotorTyp(motorTypStr, false);
+        IHersteller hersteller = getHerstellerPersister().findByKey(herstellerStr, false);
+        IMassstab massstab = getMassstabPersister().findByKey(massstabStr, false);
+        ISpurweite spurweite = getSpurweitePersister().findByKey(spurweiteStr, false);
+        IEpoch epoch = getEpochPersister().findByKey(epochStr, false);
+        IBahnverwaltung bahnverwaltung = getBahnverwaltungPersister().findByKey(bahnverwaltungStr, false);
+        IGattung gattung = getGattungPersister().findByKey(gattungStr, false);
+        IVorbild vorbild = getVorbildPersister().findByKey(gattungStr, false);
+        IAchsfolg achsfolg = getAchsfolgPersister().findByKey(achsfolgStr, false);
+        ISonderModell sondermodell = getSonderModellPersister().findByKey(sondermodellStr, false);
+        IAufbau aufbau = getAufbauPersister().findByKey(aufbauStr, false);
+        ILicht licht = getLichtPersister().findByKey(lichtStr, false);
+        IKupplung kupplung = getKupplungPersister().findByKey(kupplungStr, false);
+        ISteuerung steuerung = getSteuerungPersister().findByKey(steuerungStr, false);
+        IMotorTyp motorTyp = getMotorTypPersister().findByKey(motorTypStr, false);
 
         Produkt entity = new Produkt(id,
                 hersteller,
@@ -170,7 +200,16 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(value = "Finds a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response get(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.get(herstellerStr, bestellNr);
+            return super.get(new IProduktKey() {
+                @Override
+                public String getHersteller() {
+                    return herstellerStr;
+                }
+
+                @Override
+                public String getBestellNr() {
+                    return bestellNr;
+                }} );
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -233,7 +272,17 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(code = 202, value = "Updates a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response update(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr, Produkt entity) {
         try {
-            return super.update(herstellerStr, bestellNr, entity);
+            return super.update(new IProduktKey() {
+                @Override
+                public String getHersteller() {
+                    return herstellerStr;
+                }
+
+                @Override
+                public String getBestellNr() {
+                    return bestellNr;
+                }
+            }, entity);
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -246,7 +295,17 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(code = 204, value = "Deletes a Produkt by hersteller and bestell nr")
     public Response delete(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            return super.delete(herstellerStr, bestellNr);
+            return super.delete(new IProduktKey() {
+                @Override
+                public String getHersteller() {
+                    return herstellerStr;
+                }
+
+                @Override
+                public String getBestellNr() {
+                    return bestellNr;
+                }
+            });
         } catch (Exception e) {
             return getResponse(serverError(e));
         }
@@ -262,14 +321,14 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         try {
             logPost(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, true);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt == null) {
                 return getResponse(badRequest(null, "Produkt " + herstellerStr + "/" + bestellNr + " does not exist"));
             }
 
             
-            IProdukt teil =  getPersister().findByKey(teilHerstellerStr, teilBestellNr, true);
+            IProdukt teil = findProdukt(herstellerStr, bestellNr);
 
             if (teil == null) {
                 return getResponse(badRequest(null, "Produkt " + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
@@ -289,6 +348,22 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         }
     }
 
+    private IProdukt findProdukt(
+        @PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr,
+        @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) throws Exception {
+        return getPersister().findByKey(new IProduktKey() {
+            @Override
+            public String getHersteller() {
+                return herstellerStr;
+            }
+
+            @Override
+            public String getBestellNr() {
+                return bestellNr;
+            }
+        }, false);
+    }
+
     @PUT
     @Path(ApiPaths.PRODUKT_TEIL_PATH)
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -299,7 +374,8 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         try {
             logPut(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-            IProduktTeil produktTeil = getTeilPersister().findByKey(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
+            IProduktTeil produktTeil = findTeil(herstellerStr, bestellNr, teilHerstellerStr,
+                teilBestellNr);
 
             if (produktTeil == null) {
                 return getResponse(badRequest(null, "ProduktTeil " + herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
@@ -327,7 +403,8 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         try {
             logDelete(herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr);
 
-            IProduktTeil produktTeil = getTeilPersister().findByKey(herstellerStr, bestellNr, teilHerstellerStr, teilBestellNr, true);
+            IProduktTeil produktTeil = findTeil(herstellerStr, bestellNr, teilHerstellerStr,
+                teilBestellNr);
 
             if (produktTeil == null) {
                 return getResponse(badRequest(null, "IProduktTeil " + herstellerStr + "/" + bestellNr + teilHerstellerStr + "/" + teilBestellNr + " does not exist"));
@@ -347,6 +424,35 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         }
     }
 
+    private IProduktTeil findTeil(
+        @PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr,
+        @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr,
+        @PathParam(ApiPaths.TEIL_HERSTELLER_PARAM_NAME) String teilHerstellerStr,
+        @PathParam(ApiPaths.TEIL_BESTELL_NR_PARAM_NAME) String teilBestellNr)
+        throws Exception {
+        return getTeilPersister().findByKey(new IProduktTeilKey() {
+            @Override
+            public String getTeilHersteller() {
+                return herstellerStr;
+            }
+
+            @Override
+            public String getTeilBestellNr() {
+                return bestellNr;
+            }
+
+            @Override
+            public String getHersteller() {
+                return teilHerstellerStr;
+            }
+
+            @Override
+            public String getBestellNr() {
+                return teilBestellNr;
+            }
+        }, true);
+    }
+
     @PUT
     @Path(ApiPaths.PRODUKT_ABBILDUNG)
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
@@ -363,7 +469,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
@@ -388,7 +494,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(code = 204, value = "Deletes the picture for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteAbbildung(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getAbbildung());
@@ -422,7 +528,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
@@ -447,7 +553,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(code = 204, value = "Deletes the instructions for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteAnleitungen(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getAnleitungen());
@@ -481,7 +587,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
                 return getResponse(badRequest(null, "Invalid file '" + fileDetail.getFileName() + "'"));
             }
 
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null) {
                 java.nio.file.Path file = handler.upload(ApiNames.PRODUKT, new String[] { herstellerStr, bestellNr }, fileDetail, fileData);
@@ -506,7 +612,7 @@ public class ProduktService extends AbstractItemService<IProdukt> {
     @ApiOperation(code = 204, value = "Deletes the drawing for a Produkt by hersteller and bestell nr", response = Produkt.class)
     public Response deleteExplosionszeichnung(@PathParam(ApiPaths.HERSTELLER_PARAM_NAME) String herstellerStr, @PathParam(ApiPaths.BESTELL_NR_PARAM_NAME) String bestellNr) {
         try {
-            IProdukt produkt = getPersister().findByKey(herstellerStr, bestellNr, false);
+            IProdukt produkt = findProdukt(herstellerStr, bestellNr);
 
             if (produkt != null && produkt.getAbbildung() != null) {
                 StaticContentFinder.getStore().removeFile(produkt.getExplosionszeichnung());
@@ -524,7 +630,21 @@ public class ProduktService extends AbstractItemService<IProdukt> {
         return getResponse(notFound());
     }
 
-    private IPersister<IProduktTeil> getTeilPersister() {
+    private IPersister<IProduktTeil, IProduktTeilKey> getTeilPersister() {
         return teilPersister;
     }
+    private IPersister<IHersteller, String> getHerstellerPersister() { return herstellerPersister; }
+    private IPersister<IMassstab, String> getMassstabPersister() { return massstabPersister; }
+    private IPersister<ISpurweite, String> getSpurweitePersister() { return spurweitePersister; }
+    private IPersister<IEpoch, String> getEpochPersister() { return epochPersister; }
+    private IPersister<IBahnverwaltung, String> getBahnverwaltungPersister() { return bahnverwaltungPersister; }
+    private IPersister<IGattung, String> getGattungPersister() { return gattungPersister; }
+    private IPersister<IVorbild, String> getVorbildPersister() { return vorbildPersister; }
+    private IPersister<IAchsfolg, String> getAchsfolgPersister() { return achsfolgPersister; }
+    private IPersister<ISonderModell, String> getSonderModellPersister() { return sondermodellPersister; }
+    private IPersister<IAufbau, String> getAufbauPersister() { return aufbauPersister; }
+    private IPersister<ILicht, String> getLichtPersister() { return lichtPersister; }
+    private IPersister<IKupplung, String> getKupplungPersister() { return kupplungPersister; }
+    private IPersister<ISteuerung, String> getSteuerungPersister() { return steuerungPersister; }
+    private IPersister<IMotorTyp, String> getMotorTypPersister() { return motorTypPersister; }
 }

@@ -15,5 +15,5 @@ public interface IPersisterFactory {
      * @param clazz the clazz
      * @return the i persister< e>
      */
-    <I extends IItem, K> IPersister<I, K> createPersister(Class<?> clazz);
+    <I extends IItem> IPersister<?, ?> createPersister(Class<I> clazz);
 }

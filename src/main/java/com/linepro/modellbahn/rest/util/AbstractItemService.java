@@ -92,22 +92,22 @@ public abstract class AbstractItemService<I extends IItem, K> extends AbstractSe
 
     @ApiResponses({@ApiResponse(code = 404, message = "Not found"),
         @ApiResponse(code = 500, message = "Internal Server Error")})
-protected Response get(K key) {
-    try {
-        logGet(getEntityClassName() + ": " + key);
+    protected Response get(K key) {
+        try {
+            logGet(getEntityClassName() + ": " + key);
 
-        I entity = getPersister().findByKey(key, true);
+            I entity = getPersister().findByKey(key, true);
 
-        if (entity == null) {
-            return getResponse(notFound());
+            if (entity == null) {
+                return getResponse(notFound());
+            }
+
+            return getResponse(ok(), entity, true, true);
+        } catch (Exception e) {
+            return getResponse(serverError(e));
         }
 
-        return getResponse(ok(), entity, true, true);
-    } catch (Exception e) {
-        return getResponse(serverError(e));
     }
-
-}
 
     @ApiResponses({@ApiResponse(code = 404, message = "Not found"),
             @ApiResponse(code = 500, message = "Internal Server Error")})

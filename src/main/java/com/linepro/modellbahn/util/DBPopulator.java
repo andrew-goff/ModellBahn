@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.util;
 
+import com.linepro.modellbahn.model.util.IDecoderCreator;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -415,9 +416,9 @@ public class DBPopulator {
     }
 
     private void populateDecoder() {
-        IPersister<Decoder> persister = persisterFactory.createPersister(Decoder.class);
+        IPersister<IDecoder> persister = persisterFactory.createPersister(IDecoder.class);
 
-        DecoderCreator creator = new DecoderCreator(persister);
+        IDecoderCreator creator = new DecoderCreator(persister);
 
         IDecoderTyp decoderTyp = findDecoderTyp("ESU", "62400");
 
@@ -2218,7 +2219,7 @@ public class DBPopulator {
 
     private <E extends IItem> E findByKey(IKey key, Class<E> entityClass) {
         try {
-            IPersister<E> persister = persisterFactory.createPersister(entityClass);
+            IPersister<?, ?> persister = persisterFactory.createPersister(entityClass);
 
             return persister.findByKey(key, false);
         } catch (Exception e) {
@@ -2233,7 +2234,8 @@ public class DBPopulator {
     }
 
     private IAchsfolg findAchsfolg(String name) {
-        return findName(name, Achsfolg.class);
+
+      return findName(name, Achsfolg.class);
     }
 
     private IAntrieb findAntreib(String name) {

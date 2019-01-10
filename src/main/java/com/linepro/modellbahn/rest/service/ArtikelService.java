@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IProduktKey;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,7 +35,6 @@ import com.linepro.modellbahn.model.IWahrung;
 import com.linepro.modellbahn.model.impl.Artikel;
 import com.linepro.modellbahn.model.util.Status;
 import com.linepro.modellbahn.persistence.IPersister;
-import com.linepro.modellbahn.persistence.IProduktPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -62,17 +62,17 @@ import io.swagger.annotations.ApiResponses;
 @Path(ApiPaths.ARTIKEL)
 public class ArtikelService extends AbstractItemService<IArtikel, String> {
 
-    protected final IProduktPersister produktPersister;
-    protected final IPersister<IWahrung, String> wahrungPersister;
-    protected final IPersister<ISteuerung, String> steuerungPersister;
-    protected final IPersister<IMotorTyp, String> motorTypPersister;
-    protected final IPersister<ILicht, String> lichtPersister;
-    protected final IPersister<IKupplung, String> kupplungPersister;
-    protected final IPersister<IDecoder,String> decoderPersister;
+    private final IPersister<IProdukt, IProduktKey> produktPersister;
+    private final IPersister<IWahrung, String> wahrungPersister;
+    private final IPersister<ISteuerung, String> steuerungPersister;
+    private final IPersister<IMotorTyp, String> motorTypPersister;
+    private final IPersister<ILicht, String> lichtPersister;
+    private final IPersister<IKupplung, String> kupplungPersister;
+    private final IPersister<IDecoder,String> decoderPersister;
 
     public ArtikelService() {
         super(Artikel.class);
-        produktPersister = (IProduktPersister) StaticPersisterFactory.get().createPersister(IProdukt.class);
+        produktPersister = StaticPersisterFactory.get().createPersister(IProdukt.class);
         wahrungPersister = StaticPersisterFactory.get().createPersister(IWahrung.class);
         steuerungPersister = StaticPersisterFactory.get().createPersister(ISteuerung.class);
         motorTypPersister = StaticPersisterFactory.get().createPersister(ISteuerung.class);
@@ -101,13 +101,23 @@ public class ArtikelService extends AbstractItemService<IArtikel, String> {
             @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
             @JsonProperty(value = ApiNames.STATUS) String statusStr,
             @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IProdukt produkt = produktPersister.findByKey(herstellerStr, bestellNr, false);
-        IWahrung wahrung = wahrungPersister.findByKey(wahrungStr, false);
-        ISteuerung steuerung = steuerungPersister.findByKey(steuerungStr, false);
-        IMotorTyp motorTyp = motorTypPersister.findByKey(motorTypStr, false);
-        ILicht licht = lichtPersister.findByKey(lichtStr, false);
-        IKupplung kupplung = kupplungPersister.findByKey(kupplungStr, false);
-        IDecoder decoder = decoderPersister.findByKey(decoderId, false);
+        IProdukt produkt = getProduktPersister().findByKey(new IProduktKey() {
+            @Override
+            public String getHersteller() {
+                return herstellerStr;
+            }
+
+            @Override
+            public String getBestellNr() {
+                return bestellNr;
+            }
+        }, false);
+        IWahrung wahrung = getWahrungPersister().findByKey(wahrungStr, false);
+        ISteuerung steuerung = getSteuerungPersister().findByKey(steuerungStr, false);
+        IMotorTyp motorTyp = getMotorTypPersister().findByKey(motorTypStr, false);
+        ILicht licht = getLichtPersister().findByKey(lichtStr, false);
+        IKupplung kupplung = getKupplungPersister().findByKey(kupplungStr, false);
+        IDecoder decoder = getDecoderPersister().findByKey(decoderId, false);
         Status status = Status.valueOf(statusStr);
         
         Artikel entity = new Artikel(id, produkt, kaufdatum, wahrung, preis, stuck,
@@ -251,5 +261,33 @@ public class ArtikelService extends AbstractItemService<IArtikel, String> {
         }
 
         return getResponse(notFound());
+    }
+
+    protected IPersister<IProdukt, IProduktKey> getProduktPersister() {
+        return produktPersister;
+    }
+
+    protected IPersister<IWahrung, String> getWahrungPersister() {
+        return wahrungPersister;
+    }
+
+    protected IPersister<ISteuerung, String> getSteuerungPersister() {
+        return steuerungPersister;
+    }
+
+    protected IPersister<IMotorTyp, String> getMotorTypPersister() {
+        return motorTypPersister;
+    }
+
+    protected IPersister<ILicht, String> getLichtPersister() {
+        return lichtPersister;
+    }
+
+    protected IPersister<IKupplung, String> getKupplungPersister() {
+        return kupplungPersister;
+    }
+
+    protected IPersister<IDecoder, String> getDecoderPersister() {
+        return decoderPersister;
     }
 }

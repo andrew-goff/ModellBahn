@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.persistence;
 
-public class IZugConsistKey {
-
+public interface IZugConsistKey {
+  String getZug();
+  Integer getPosition();
 }

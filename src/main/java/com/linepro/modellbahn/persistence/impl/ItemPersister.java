@@ -1,13 +1,11 @@
 package com.linepro.modellbahn.persistence.impl;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerator.IdKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -28,11 +26,8 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
-import com.google.inject.assistedinject.Assisted;
 import com.linepro.modellbahn.guice.ISessionManagerFactory;
 import com.linepro.modellbahn.model.IItem;
-
-
 
 import com.linepro.modellbahn.persistence.DBNames;
 import com.linepro.modellbahn.persistence.IIdGenerator;
@@ -48,26 +43,20 @@ import com.linepro.modellbahn.util.SelectorsBuilder;
  * @author   $Author$
  * @version  $Id$
  *
- * @param <E> the element type
+ * @param <I> the element type
  */
-public abstract class AbstractItemPersister<E extends IItem, K> implements IPersister<E, K> {
+public abstract class ItemPersister<I extends IItem, K> implements IPersister<I, K> {
 
-    /** The entity manager. */
     private final ISessionManagerFactory sessionManagerFactory;
 
-    /** The logger. */
     private final Logger logger;
 
-    /** The entity class. */
-    private final Class<E> entityClass;
+    private final Class<?> entityClass;
 
-    /** The selectors. */
     private final Map<String, Selector> selectors;
 
-    /** The business keys. */
     private final Map<String, Selector> businessKeys;
 
-    /** Collections on the object */
     private final Map<String, Selector> collections;
 
     private final String entityName;
@@ -85,12 +74,10 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
      * @param logManager the log manager
      * @param entityClass the entity class
      */
-    @Inject
-    public AbstractItemPersister(final ISessionManagerFactory sessionManagerFactory, final ILoggerFactory logManager,
-            @Assisted final Class<E> entityClass) {
+    public ItemPersister(final ISessionManagerFactory sessionManagerFactory, final ILoggerFactory logManager, final Class<? extends I> entityClass) {
         this.sessionManagerFactory = sessionManagerFactory;
         this.logger = logManager.getLogger(entityClass.getName());
-        this.entityClass = entityClass;
+        this.entityClass = (Class<I>) entityClass;
         this.idGenerator = new IdGenerator(sessionManagerFactory);
 
         businessKeys = new SelectorsBuilder().build(entityClass, BusinessKey.class);
@@ -101,12 +88,12 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         entityName = entityAnnotation != null ? entityAnnotation.name() : entityClass.getSimpleName();
 
         StringBuilder queryString = new StringBuilder("SELECT e FROM ")
-                .append(entityName)
+                .append(getEntityName())
                 .append(" e WHERE ");
 
         int i = 0;
 
-        for (Selector businessKey : businessKeys.values()) {
+        for (Selector businessKey : getBusinessKeys().values()) {
             if (i == 0) {
                 idKey = businessKey.getName();
             } else {
@@ -121,11 +108,11 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
 
         businessKeyQuery = queryString.toString();
 
-        debug(businessKeyQuery);
+        debug(getBusinessKeyQuery());
     }
 
     @Override
-    public E add(E entity) throws Exception {
+    public I add(I entity) throws Exception {
         ISessionManager session = getSession();
 
         try {
@@ -148,22 +135,17 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public E update(Long id, E entity) throws Exception {
+    public I update(Long id, I entity) throws Exception {
         return internalUpdate(id, entity, false);
     }
 
     @Override
-    public E update(E entity) throws Exception {
-        return internalUpdate(entity, false);
-    }
-
-    @Override
-    public E update(K key, E entity) throws Exception {
+    public I update(K key, I entity) throws Exception {
         return internalUpdate(key, entity, false);
     }
 
     @Override
-    public E save(E entity) throws Exception {
+    public I save(I entity) throws Exception {
         return internalUpdate(entity, true);
     }
 
@@ -176,17 +158,17 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
      * @throws Exception the exception
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private E internalUpdate(Long id, E entity, boolean addOrUpdate) throws Exception {
+    private I internalUpdate(Long id, I entity, boolean addOrUpdate) throws Exception {
         ISessionManager session = getSession();
 
         try {
-            E found = internalFindByKey(session, key, false);
+            I found = internalFindByKey(session, key, false);
             
             if (found == null && !addOrUpdate) {
                 return null;
             }
 
-            E result;
+            I result;
             
             if (found == null) {
                 // Save the new entity
@@ -195,7 +177,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
                 result = found;
 
                 // Copy updated values into existing entity
-                for (Selector selector : selectors.values()) {
+                for (Selector selector : getSelectors().values()) {
                     Object value = selector.getGetter().invoke(entity);
 
                     if (value instanceof Collection) {
@@ -227,7 +209,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         ISessionManager session = getSession();
             try {
 
-            E found = findById(id, false);
+            I found = findById(id, false);
 
             session.getEntityManager().remove(found);
 
@@ -243,7 +225,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         }
     }
 
-    public void delete(E entity) throws Exception {
+    public void delete(I entity) throws Exception {
         delete(entity);
     }
 
@@ -252,7 +234,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         ISessionManager session = getSession();
 
         try {
-            E found = internalFindByKey(session, key, false);
+            I found = internalFindByKey(session, key, false);
 
             session.getEntityManager().remove(found);
             
@@ -274,15 +256,15 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public void deleteAll(E template) throws Exception {
+    public void deleteAll(I template) throws Exception {
         ISessionManager session = getSession();
 
         try {
             CriteriaBuilder builder = session.getEntityManager().getCriteriaBuilder();
-            CriteriaDelete<E> query = builder.createCriteriaDelete(getEntityClass());
-            Root<E> root = query.from(getEntityClass());
+            CriteriaDelete<I> query = builder.createCriteriaDelete(getEntityClass());
+            Root<I> root = query.from(getEntityClass());
 
-            List<Predicate> predicates = getConditions(builder, root, template, selectors, Collections.emptyMap(), null);
+            List<Predicate> predicates = getConditions(builder, root, template, getSelectors(), Collections.emptyMap(), null);
 
             if (!predicates.isEmpty()) {
                 query.where(predicates.toArray(new Predicate[] {}));
@@ -303,11 +285,11 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public E findById(Long id, boolean eager) throws Exception {
+    public I findById(Long id, boolean eager) throws Exception {
         ISessionManager session = getSession();
 
         try {
-            E result = null;
+            I result = null;
             
             if (id != null) {
                 result = inflate(session.getEntityManager().find(getEntityClass(), id), eager);
@@ -328,30 +310,11 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public E findByKey(E entity, boolean eager) throws Exception {
+    public I findByKey(K key, boolean eager) throws Exception {
         ISessionManager session = getSession();
 
         try {
-            Query query = session.getEntityManager().createQuery(businessKeyQuery);
-
-            addCriteria(query, entity);
-
-            return internalFindByKey(query, eager);
-        } catch (Exception e) {
-            error("findByKey error: " + entity, e);
-
-            session.rollback();
-           
-            throw e;
-        }
-    }
-
-    @Override
-    public E findByKey(K key, boolean eager) throws Exception {
-        ISessionManager session = getSession();
-
-        try {
-            Query query = session.getEntityManager().createQuery(businessKeyQuery);
+            Query query = session.getEntityManager().createQuery(getBusinessKeyQuery());
 
             addCriteria(query, key);
             
@@ -365,15 +328,15 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         }
     }
 
-    private E internalFindByKey(Query query, boolean eager) throws Exception {
+    private I internalFindByKey(Query query, boolean eager) throws Exception {
         @SuppressWarnings("unchecked")
-        List<E> results = (List<E>) query.getResultList();
+        List<I> results = (List<I>) query.getResultList();
         
         if (results.size() > 1) {
             throw new NonUniqueResultException();
         }
         
-        E result = null;
+        I result = null;
         
         if (results.size() == 1) {
             result = inflate(results.get(0), eager);
@@ -385,26 +348,21 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public Long countAll() throws Exception {
+    public Long countAll(I template) throws Exception {
         return countAll(null, Collections.emptyMap());
     }
 
     @Override
-    public Long countAll(E template) throws Exception {
-        return countAll(null, Collections.emptyMap());
-    }
-
-    @Override
-    public Long countAll(E template, Map<String,List<String>> references) throws Exception {
+    public Long countAll(I template, Map<String,List<String>> references) throws Exception {
         ISessionManager session = getSession();
 
         try {
             CriteriaBuilder builder = session.getEntityManager().getCriteriaBuilder();
             CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-            Root<E> root = countQuery.from(getEntityClass());
+            Root<?> root = countQuery.from(getEntityClass());
             countQuery.select(builder.count(root));
 
-            List<Predicate> predicates = getConditions(builder, root, template, selectors, references, countQuery);
+            List<Predicate> predicates = getConditions(builder, root, template, getSelectors(), references, countQuery);
 
             if (!predicates.isEmpty()) {
                 countQuery.where(predicates.toArray(new Predicate[] {}));
@@ -427,32 +385,32 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     @Override
-    public List<E> findAll() throws Exception {
+    public List<I> findAll() throws Exception {
         return findAll(null);
     }
 
     @Override
-    public List<E> findAll(E template) throws Exception {
+    public List<I> findAll(I template) throws Exception {
         return findAll(template, null, null);
     }
 
     @Override
-    public List<E> findAll(E template, Integer startPosition, Integer maxSize) throws Exception {
+    public List<I> findAll(I template, Integer startPosition, Integer maxSize) throws Exception {
         return findAll(template, Collections.emptyMap(), startPosition, maxSize);
     }
 
     @Override
-    public List<E> findAll(E template, Map<String,List<String>> references, Integer startPosition, Integer maxSize) throws Exception {
-        return findAll(template, references, selectors, startPosition, maxSize);
+    public List<I> findAll(I template, Map<String,List<String>> references, Integer startPosition, Integer maxSize) throws Exception {
+        return findAll(template, references, getSelectors(), startPosition, maxSize);
     }
 
-    private List<E> findAll(E template, Map<String,List<String>> references, Map<String, Selector> selectors, Integer startPosition, Integer maxResult) throws Exception {
+    private List<I> findAll(I template, Map<String,List<String>> references, Map<String, Selector> selectors, Integer startPosition, Integer maxResult) throws Exception {
         ISessionManager session = getSession();
 
         try {
             CriteriaBuilder builder = session.getEntityManager().getCriteriaBuilder();
-            CriteriaQuery<E> criteria = builder.createQuery(getEntityClass());
-            Root<E> root = criteria.from(getEntityClass());
+            CriteriaQuery<I> criteria = builder.createQuery(getEntityClass());
+            Root<I> root = criteria.from(getEntityClass());
 
             List<Predicate> predicates = getConditions(builder, root, template, selectors, references, criteria);
 
@@ -462,7 +420,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
                 criteria.select(root);
             }
 
-            TypedQuery<E> query = session.getEntityManager().createQuery(criteria);
+            TypedQuery<I> query = session.getEntityManager().createQuery(criteria);
 
             if (startPosition != null) {
                 query.setFirstResult(startPosition * maxResult);
@@ -472,7 +430,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
                 query.setMaxResults(maxResult);
             }
 
-            List<E> result = query.getResultList();
+            List<I> result = query.getResultList();
 
             debug("findAll found: " + result);
 
@@ -497,7 +455,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
      * @return the conditions
      * @throws Exception the exception
      */
-    private List<Predicate> getConditions(CriteriaBuilder builder, Root<E> root, E template, Map<String, Selector> selectors,
+    private List<Predicate> getConditions(CriteriaBuilder builder, Root<I> root, I template, Map<String, Selector> selectors,
                                           Map<String,List<String>> references, CriteriaQuery criteria) throws Exception {
         List<Predicate> predicates = new ArrayList<>();
 
@@ -540,7 +498,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         
     }
 
-    /**
+    /** The logger. */ /**
      * Gets the logger.
      *
      * @return the logger
@@ -582,8 +540,9 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     
+    /** The entity class. */
     @Override
-    public Class<E> getEntityClass() {
+    public Class<?> getEntityClass() {
         return entityClass;
     }
 
@@ -592,6 +551,7 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
         return entityName;
     }
 
+    /** The selectors. */
     @Override
     public Map<String, Selector> getSelectors() {
         return selectors;
@@ -604,8 +564,8 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
      * @throws Exception if we are naughty
      */
     @Override
-    public E create() throws Exception {
-        return getEntityClass().newInstance();
+    public I create() throws Exception {
+        return (I) getEntityClass().newInstance();
     }
 
     /**
@@ -616,9 +576,9 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
      * @return the same entity you passed in with it's lazy collections populated
      * @throws Exception if there is a DB error
      */
-    private E inflate(E entity, boolean eager) throws Exception {
+    private I inflate(I entity, boolean eager) throws Exception {
         if (eager && entity != null) {
-            for (Selector selector : collections.values()) {
+            for (Selector selector : getCollections().values()) {
                 Collection<?> collection = (Collection<?>) selector.getGetter().invoke(entity);
                 
                 if (collection instanceof PersistentCollection) {
@@ -631,17 +591,44 @@ public abstract class AbstractItemPersister<E extends IItem, K> implements IPers
     }
 
     private ISessionManager getSession() {
-        SessionManager sessionManager = sessionManagerFactory.create();
+        SessionManager sessionManager = getSessionManagerFactory().create();
         sessionManager.begin();
         return sessionManager;
     }
 
     @Override
     public String getNextId() {
-        return idGenerator.getNextId(getEntityName(), idKey);
+        return getIdGenerator().getNextId(getEntityName(), getIdKey());
     }
 
     abstract void addCriteria(Query query, K key);
 
-    abstract void addCriteria(Query query, E entity);
+    abstract void addCriteria(Query query, I entity);
+
+    /** The entity manager. */
+    protected ISessionManagerFactory getSessionManagerFactory() {
+        return sessionManagerFactory;
+    }
+
+    /** The business keys. */
+    protected Map<String, Selector> getBusinessKeys() {
+        return businessKeys;
+    }
+
+    /** Collections on the object */
+    protected Map<String, Selector> getCollections() {
+        return collections;
+    }
+
+    protected IIdGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    protected String getBusinessKeyQuery() {
+        return businessKeyQuery;
+    }
+
+    protected String getIdKey() {
+        return idKey;
+    }
 }

@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.rest.util.AbstractItemService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -19,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.linepro.modellbahn.model.IWahrung;
 import com.linepro.modellbahn.model.impl.Wahrung;
 import com.linepro.modellbahn.rest.json.Views;
-import com.linepro.modellbahn.rest.util.AbstractNamedItemService;
 import com.linepro.modellbahn.rest.util.ApiNames;
 import com.linepro.modellbahn.rest.util.ApiPaths;
 
@@ -36,7 +36,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = ApiNames.WAHRUNG, description = "Wahrung (currency) maintenance")
 @Path(ApiPaths.WAHRUNG)
-public class WahrungService extends AbstractNamedItemService<IWahrung> {
+public class WahrungService extends AbstractItemService<IWahrung, String> {
 
     public WahrungService() {
         super(Wahrung.class);

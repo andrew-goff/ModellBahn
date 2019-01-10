@@ -42,7 +42,7 @@ public class PersisterFactory implements IPersisterFactory {
     private final ILoggerFactory logManager;
 
     /** The persisters. */
-    private final Map<Class<? extends IItem>,IPersister<? extends IItem>> persisters = new HashMap<>();
+    private final Map<Class<?>,IPersister<?,?>> persisters = new HashMap<>();
     
     /**
      * Instantiates a new persister factory.
@@ -57,9 +57,8 @@ public class PersisterFactory implements IPersisterFactory {
     }
 
     @Override
-    public synchronized <E extends IItem> IPersister<E> createPersister(Class<E> entityClass) {
-        @SuppressWarnings("unchecked")
-        IPersister<E> persister = (IPersister<E>) persisters.get(entityClass);
+    public synchronized <E extends IItem> IPersister<?, ?> createPersister(Class<E> entityClass) {
+        IPersister<?, ?> persister = persisters.get(entityClass);
         
         if (persister == null) {
             if (IArtikel.class.isAssignableFrom(entityClass)) {
@@ -71,7 +70,7 @@ public class PersisterFactory implements IPersisterFactory {
             } else if (IDecoderCV.class.isAssignableFrom(entityClass)) {
                 persister = new DecoderCVPersister(sessionManagerFactory, logManager);
             } else if (IDecoderFunktion.class.isAssignableFrom(entityClass)) {
-                persister = new IDecoderFunktionPersister(sessionManagerFactory, logManager);
+                persister = new DecoderFunktionPersister(sessionManagerFactory, logManager);
             } else if (IDecoderTyp.class.isAssignableFrom(entityClass)) {
                 persister = new DecoderTypPersister(sessionManagerFactory, logManager);
             } else if (IDecoderTypAdress.class.isAssignableFrom(entityClass)) {
@@ -79,7 +78,7 @@ public class PersisterFactory implements IPersisterFactory {
             } else if (IDecoderTypCV.class.isAssignableFrom(entityClass)) {
                 persister = new DecoderTypCVPersister(sessionManagerFactory, logManager);
             } else if (IDecoderTypFunktion.class.isAssignableFrom(entityClass)) {
-                persister = new IDecoderTypFunktionPersister(sessionManagerFactory, logManager);
+                persister = new DecoderTypFunktionPersister(sessionManagerFactory, logManager);
             } else if (IProdukt.class.isAssignableFrom(entityClass)) {
                 persister = new ProduktPersister(sessionManagerFactory, logManager);
             } else if (IProduktTeil.class.isAssignableFrom(entityClass)) {
@@ -100,3 +99,4 @@ public class PersisterFactory implements IPersisterFactory {
         return persister;
     }
 }
+

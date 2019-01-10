@@ -1,5 +1,6 @@
 package com.linepro.modellbahn.rest.service;
 
+import com.linepro.modellbahn.persistence.IDecoderTypKey;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,7 +31,7 @@ import com.linepro.modellbahn.model.impl.DecoderTyp;
 import com.linepro.modellbahn.model.impl.Protokoll;
 import com.linepro.modellbahn.model.util.AdressTyp;
 import com.linepro.modellbahn.model.util.DecoderCreator;
-import com.linepro.modellbahn.persistence.IDecoderTypPersister;
+import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.impl.StaticPersisterFactory;
 import com.linepro.modellbahn.rest.json.Views;
 import com.linepro.modellbahn.rest.util.AbstractItemService;
@@ -54,12 +55,12 @@ import io.swagger.annotations.ApiResponses;
 @Path(ApiPaths.DECODER)
 public class DecoderService extends AbstractItemService<IDecoder, String> {
 
-    protected final IDecoderTypPersister decoderTypPersister;
+    protected final IPersister<IDecoderTyp, IDecoderTypKey> decoderTypPersister;
 
     public DecoderService() {
         super(Decoder.class);
 
-        decoderTypPersister = (IDecoderTypPersister) StaticPersisterFactory.get().createPersister(IDecoderTyp.class);
+        decoderTypPersister = StaticPersisterFactory.get().createPersister(IDecoderTyp.class);
     }
 
     @JsonCreator
@@ -106,7 +107,17 @@ public class DecoderService extends AbstractItemService<IDecoder, String> {
         })
     public Response addDecoder(@PathParam(ApiNames.HERSTELLER) String herstellerStr, @PathParam(ApiNames.BESTELL_NR) String bestellNr) {
         try {
-            IDecoderTyp decoderTyp = getDecoderTypPersister().findByKey(herstellerStr, bestellNr, true);
+            IDecoderTyp decoderTyp = getDecoderTypPersister().findByKey(new IDecoderTypKey() {
+                @Override
+                public String getHersteller() {
+                    return herstellerStr;
+                }
+
+                @Override
+                public String getBestellNr() {
+                    return bestellNr;
+                }
+            }, true);
 
             if (decoderTyp == null) {
                 return getResponse(badRequest(null, "DecoderTyp " + herstellerStr + "/" + bestellNr + " does not exist"));
@@ -406,7 +417,7 @@ public class DecoderService extends AbstractItemService<IDecoder, String> {
         return null;
     }
 
-    private IDecoderTypPersister getDecoderTypPersister() {
+    private IPersister<IDecoderTyp, IDecoderTypKey> getDecoderTypPersister() {
         return decoderTypPersister;
     }
 }

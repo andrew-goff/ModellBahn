@@ -26,21 +26,6 @@ import com.linepro.modellbahn.model.impl.Kategorie;
 import com.linepro.modellbahn.model.impl.Produkt;
 import com.linepro.modellbahn.model.impl.Vorbild;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.linepro.modellbahn.persistence.IKey;
-import com.linepro.modellbahn.persistence.IKeyGenerator;
 import com.linepro.modellbahn.persistence.IPersister;
 import com.linepro.modellbahn.persistence.IPersisterFactory;
 import java.util.List;
@@ -73,13 +58,9 @@ public class ConverterFactory implements IConverterFactory {
 
     @Override
     public <E extends IItem> void registerConverter(Class<E> entityClass) {
-        IPersister<E> persister = persisterFactory.createPersister(entityClass);
+        IPersister<?, ?> persister = persisterFactory.createPersister(entityClass);
 
-        IKeyGenerator generator = getGenerator(entityClass);
-
-        if (generator != null) {
-            ConvertUtils.register(new ItemConverter(persister, generator), entityClass);
-        }
+        ConvertUtils.register(new ItemConverter(persister, generator), entityClass);
     }
 
     IKeyGenerator getGenerator(Class<?> entityClass) {
