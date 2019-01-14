@@ -126,7 +126,9 @@ const getButton = (value, alt, action) => {
 };
 
 const addText = (cell, text) => {
-  cell.appendChild(document.createTextNode(text));
+  let txt = document.createTextNode(text);
+  cell.appendChild(txt);
+  return txt;
 };
 
 const getButtonLink = (href, alt, action) => {
@@ -442,6 +444,120 @@ class PDFColumn extends Column {
   }
 }
 
+const closeAutoLists = (elmnt) => {
+  let autoComp = document.getElementsByClassName('autocomplete-list');
+  for (let i = 0 ; i < autoComp.length; i++) {
+    autoComp[i].parent.removeChild(autoComp[i]);
+  }
+};
+
+class AutoCompleteColumn extends Column {
+  constructor(heading, binding, getter, setter, dropDown, editable, required) {
+    super(heading, binding, getter, setter, editable, required, dropDown.length);
+    this.options = dropDown.options;
+
+    document.addEventListener('click', this.closeAllLists);
+  }
+
+  getControl(cell, entity, editMode) {
+    let ctl = super.createControl();
+    ctl.type = 'text';
+    ctl.maxLength = this.length;
+    ctl.addEventListener('input', (e) => { this.input(e); });
+    ctl.addEventListener('keydown', (e) => { this.keydown(e); }); 
+    return ctl;
+  }
+
+  getControlValue(ctl) {
+    return ctl.code;
+  }
+
+  setValue(ctl, value) {
+    ctl.code = value;    
+    ctl.options.forEach((o) => {
+      if (o.value === value) {
+        ctl.value = o.display;
+      }
+    });
+  }
+
+  input(e) {
+	let ctl = this;
+    let inp = e.target;
+
+    closeAutoLists(inp);
+
+    if (!inp.value) {
+      return false;
+    }
+
+    let autoComp = document.createElement('div');
+    autoComp.className = 'autocomplete-list';
+
+    inp.appendChild(autoComp);
+
+    ctl.options.forEach((o) => {
+      if (o.display.toLowerCase().includes(inp.value.toLowerCase())) {
+   	    let autoItem = document.createElement('div');
+        autoItem.code = o.value;
+   	    autoItem.className = 'autocomplete-items';
+        let txt = addText(autoItem, o.display.replace('/inp.value/i', '<strong>' + inp.value + '</strong>'));
+        autoItem.addEventListener('click', this.click);
+        autoComp.appendChild(autoItem);
+      }
+    });
+  }
+
+  click(e) {
+	let o = e.target;
+    let inp = o.parent;
+
+    inp.value = e.target.value;
+    inp.code = e.target.code;
+
+    closeAutoLists(inp);
+  };
+  
+  /*
+  keydown = (e) => {
+    ctl = this;
+    inp = e.target;
+
+    if (inp) x = x.getElementsByTagName('div');
+
+    if (e.keyCode == 40) {
+      currentFocus++;
+      ctl.addActive(inp);
+     } else if (e.keyCode == 38) {
+       currentFocus--;
+       ctl.addActive(inp);
+     } else if (e.keyCode == 13) {
+       e.preventDefault();
+       if (currentFocus > -1) {
+         if (inp) inp[currentFocus].click();
+       }
+     }
+  };
+
+  addActive = (inp) => {
+    if (!inp) return false;
+
+    removeActive(inp);
+      
+    if (currentFocus >= inp.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (inp.length - 1);
+
+    inp[currentFocus].classList.add('autocomplete-active');
+  }
+  
+  removeActive = (inp) => {
+    for (var i = 0; i < inp.length; i++) {
+      inp[i].classList.remove('autocomplete-active');
+    }
+  }
+  */
+}
+
 class SelectColumn extends Column {
   constructor(heading, binding, getter, setter, dropDown, editable, required) {
     super(heading, binding, getter, setter, editable, required,
@@ -669,8 +785,7 @@ const setActiveTab = (event, tabName) => {
 
   let linkName = tabName.replace('Tab', 'Link');
   for (let i = 0; i < tabLinks.length; i++) {
-    tabLinks[i].className = (tabLinks[i].id === linkName) ? 'tabLinks active'
-        : 'tabLinks';
+    tabLinks[i].className = (tabLinks[i].id === linkName) ? 'tabLinks active' : 'tabLinks';
   }
 };
 
