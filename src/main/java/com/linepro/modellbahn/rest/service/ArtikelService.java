@@ -64,45 +64,6 @@ public class ArtikelService extends AbstractItemService<ArtikelKey, IArtikel> {
         super(IArtikel.class);
     }
 
-    @JsonCreator
-    public IArtikel create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.HERSTELLER) String herstellerStr,
-            @JsonProperty(value = ApiNames.BESTELL_NR) String bestellNr,
-            @JsonProperty(value = ApiNames.KAUFDATUM) LocalDate kaufdatum,
-            @JsonProperty(value = ApiNames.WAHRUNG) String wahrungStr,
-            @JsonProperty(value = ApiNames.PREIS) BigDecimal preis,
-            @JsonProperty(value = ApiNames.STUCK) Integer stuck,
-            @JsonProperty(value = ApiNames.STEUERUNG) String steuerungStr,
-            @JsonProperty(value = ApiNames.MOTOR_TYP) String motorTypStr,
-            @JsonProperty(value = ApiNames.LICHT) String lichtStr,
-            @JsonProperty(value = ApiNames.KUPPLUNG) String kupplungStr,
-            @JsonProperty(value = ApiNames.DECODER) String decoderId,
-            @JsonProperty(value = ApiNames.NAMEN) String artikelNr,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.ANMERKUNG) String anmerkung,
-            @JsonProperty(value = ApiNames.BELADUNG) String beladung,
-            @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
-            @JsonProperty(value = ApiNames.STATUS) String statusStr,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IProdukt produkt = findProdukt(herstellerStr, bestellNr, false);
-        IWahrung wahrung = findWahrung(wahrungStr, false);
-        ISteuerung steuerung = findSteuerung(steuerungStr, false);
-        IMotorTyp motorTyp = findMotorTyp(motorTypStr, false);
-        ILicht licht = findLicht(lichtStr, false);
-        IKupplung kupplung = findKupplung(kupplungStr, false);
-        IDecoder decoder = findDecoder(decoderId, false);
-        Status status = Status.valueOf(statusStr);
-        
-        IArtikel entity = new Artikel(id, produkt, kaufdatum, wahrung, preis, stuck,
-                steuerung, motorTyp, licht, kupplung, decoder,
-                artikelNr, bezeichnung, anmerkung,
-                beladung, status, deleted);
-
-        debug("created: " + entity);
-
-       return entity;
-    }
-
     @GET
     @Path(ApiPaths.ARTIKEL_PART)
     @Produces(MediaType.APPLICATION_JSON)

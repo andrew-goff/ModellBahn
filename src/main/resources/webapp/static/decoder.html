@@ -76,7 +76,7 @@
     new NumberColumn("I Max", "iMax", (entity) => {
       return entity.decoderTyp.iMax;
     }, undefined, Editable.NEVER, false, 1000, 1),
-    new SelectColumn("Konfiguration", "konfiguration", (entity) => {
+    new DropDownColumn("Konfiguration", "konfiguration", (entity) => {
       return entity.decoderTyp.konfiguration;
     }, undefined, KONFIGURATION_DROP, Editable.NEVER, true),
     new ButtonColumn([], [updateRow])

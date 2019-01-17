@@ -43,18 +43,6 @@ public class EpochService extends AbstractItemService<NameKey, IEpoch> {
         super(IEpoch.class);
     }
 
-    @JsonCreator
-    public IEpoch create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IEpoch entity = new Epoch(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

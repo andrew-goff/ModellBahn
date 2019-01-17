@@ -43,19 +43,6 @@ public class WahrungService extends AbstractItemService<NameKey, IWahrung> {
         super(IWahrung.class);
     }
 
-    @JsonCreator
-    public IWahrung create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DEZIMAL) Integer dezimal,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IWahrung entity = new Wahrung(id, name, bezeichnung, dezimal, deleted);
-        
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

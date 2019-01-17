@@ -43,18 +43,6 @@ public class SonderModellService extends AbstractItemService<NameKey, ISonderMod
         super(ISonderModell.class);
     }
 
-    @JsonCreator
-    public ISonderModell create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        ISonderModell entity = new SonderModell(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

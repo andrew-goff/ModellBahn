@@ -316,8 +316,7 @@ class PhoneColumn extends Column {
 }
 
 class TextColumn extends Column {
-  constructor(heading, binding, getter, setter, editable, required, length,
-      pattern) {
+  constructor(heading, binding, getter, setter, editable, required, length, pattern) {
     super(heading, binding, getter, setter, editable, required, length);
     this.pattern = pattern;
   }
@@ -331,14 +330,16 @@ class TextColumn extends Column {
   }
 }
 
-class URLColumn extends Column {
+class URLColumn extends TextColumn {
   constructor(heading, binding, getter, setter, editable, required) {
-    super(heading, binding, getter, setter, editable, required, URL_PATTERN);
+    super(heading, binding, getter, setter, editable, required, 60, URL_PATTERN);
   }
 
   createControl() {
     let ctl = super.createControl();
     ctl.type = 'url';
+    ctl.class = 'table-url';
+    ctl.addEventListener('click', (e) => {if (ctl.value) { window.open(ctl.value, '_blank'); }});
     return ctl;
   }
 }
@@ -430,29 +431,35 @@ class PDFColumn extends Column {
 }
 
 const closeAutoLists = (elmnt) => {
-  let autoComp = elmnt.getElementsByClassName('autocomplete-list');
+  let autoComp = (elmnt ? elmnt : document).getElementsByClassName('autocomplete-list');
   for (let i = 0 ; i < autoComp.length; i++) {
+    removeChildren(autoComp[i]);
     autoComp[i].parentNode.removeChild(autoComp[i]);
   }
 };
 
-class AutoCompleteColumn extends Column {
+document.addEventListener('click', (e) => { closeAutoLists(); });
+
+class SelectColumn extends Column {
   constructor(heading, binding, getter, setter, dropDown, editable, required) {
     super(heading, binding, getter, setter, editable, required, dropDown.length);
     this.dropDown = dropDown;
-
-    document.addEventListener('click', closeAutoLists(document));
   }
 
   getControl(cell, entity, editMode) {
+    document.addEventListener('click', (e) => { this.leave(e); });
+
     let ctl = super.getControl(cell, entity, editMode);
-    
+
     if (!ctl.disabled) {
-      ctl.addEventListener('input', (e) => { this.input(e); });
+      ctl.addEventListener('click', (e) => { this.open(e); });
+      ctl.addEventListener('input', (e) => { this.open(e); });
       ctl.addEventListener('keydown', (e) => { this.keydown(e); });
+      ctl.addEventListener('onblur', (e) => { this.leave(e); });
+      ctl.addEventListener('onfocusout', (e) => { this.leave(e); });
       ctl.classList.add('autocomplete');
     }
-  
+
     return ctl;
   }
 
@@ -473,16 +480,29 @@ class AutoCompleteColumn extends Column {
     return Math.max(this.dropDown.length, this.getHeaderLength());
   }
 
-  input(e) {
+  caption(txt, o) {
+    return o.display;
+  }
+
+  options(txt) {
+    return this.dropDown.options;
+  }
+
+  leave(e) {
     let ctl = this;
     let inp = e.target;
     let div = inp.parentNode;
 
-    closeAutoLists(div);
+    closeAutoLists();
+  }
 
-    if (!inp.value) {
-      return false;
-    }
+  open(e) {
+    let ctl = this;
+    let inp = e.target;
+    let div = inp.parentNode;
+
+    e.stopPropagation();
+    closeAutoLists();
 
     let rect = div.getBoundingClientRect();
 
@@ -493,32 +513,18 @@ class AutoCompleteColumn extends Column {
     let dims = valueAndUnits(getComputedStyle(autoComp).lineHeight);
 
     let i = 0;
-    ctl.dropDown.options.forEach((o) => {
-      if (i < 5 && o.display.toLowerCase().includes(inp.value.toLowerCase())) {
-   	    let autoItem = document.createElement('div');
-        autoItem.setAttribute('data-name', o.value);
-   	    autoItem.className = 'autocomplete-items';
-        autoItem.style.top = (dims.value*i)+dims.units;
-        let txt = addText(autoItem, o.display.replace(/inp.value/i, '<strong>' + inp.value + '</strong>'));
-        autoItem.addEventListener('click', (e) => { this.click(e); });
-        autoComp.appendChild(autoItem);
-        i++;
-      }
+    ctl.options(inp.value).forEach((o) => {
+      let autoItem = document.createElement('div');
+      autoItem.setAttribute('data-name', o.value);
+      autoItem.className = 'autocomplete-items';
+      autoItem.style.top = (dims.value*i)+dims.units;
+      addText(autoItem, ctl.caption(inp.value, o));
+      autoItem.addEventListener('click', (e) => { this.click(e); });
+      autoComp.appendChild(autoItem);
+      i++;
     });
   }
 
-  click(e) {
-	  let opt = e.target;
-    let autoComp = opt.parentNode;
-    let div = autoComp.parentNode;
-    let inp = div.getElementsByClassName('autocomplete')[0];
-
-    inp.value = opt.innerText;
-    inp.setAttribute('data-name', opt.getAttribute('data-name'));
-
-    closeAutoLists(div);
-  };
-  
   keydown(e) {
     let ctl = this;
     let div = e.target.parentNode;
@@ -526,18 +532,30 @@ class AutoCompleteColumn extends Column {
     let autoComps = div.getElementsByClassName('autocomplete-list');
 
     if (!autoComps || !autoComps.length) return;
-    
+
     let autoComp = autoComps[0];
 
-    if (e.keyCode == 40) {
+    if (e.keyCode === 40) {
       ctl.addActive(ctl, autoComp, true);
     } else if (e.keyCode == 38) {
-       ctl.addActive(ctl, autoComp, false);
+      ctl.addActive(ctl, autoComp, false);
     } else if (e.keyCode == 13) {
-       e.preventDefault();
-       ctl.selectActive(autoComp);
+      e.preventDefault();
+      ctl.selectActive(autoComp);
     }
   }
+
+  click(e) {
+    let opt = e.target;
+    let autoComp = opt.parentNode;
+    let div = autoComp.parentNode;
+    let inp = div.getElementsByClassName('autocomplete')[0];
+
+    inp.value = opt.innerText;
+    inp.setAttribute('data-name', opt.getAttribute('data-name'));
+
+    closeAutoLists();
+  };
 
   addActive(ctl, autoComp, up) {
     let items = autoComp.getElementsByClassName('autocomplete-items');
@@ -552,54 +570,44 @@ class AutoCompleteColumn extends Column {
     let next = curr + (up ? 1 : -1);
     if (0 <= next && next <= items.length) items[next].classList.add('autocomplete-active');
   }
-  
+
   selectActive(autoComp) {
     let active = autoComp.getElementsByClassName('autocomplete-active');
     if (active.length) active[0].click();
   }
 }
 
-class SelectColumn extends Column {
+class AutoCompleteColumn extends SelectColumn {
   constructor(heading, binding, getter, setter, dropDown, editable, required) {
-    super(heading, binding, getter, setter, editable, required,
-        dropDown.length + 3.5);
-    this.dropDown = dropDown;
-    this.dropSize = 1;
+    super(heading, binding, getter, setter, editable, required, dropDown.length);
   }
 
-  addOptions(select, dropDown) {
-    if (!this.required) {
-      addOption(select, undefined, '(n/a)');
+  options(txt) {
+    return this.dropDown.options.filter((o) => { return o.display.toLowerCase().includes(txt.toLowerCase()); }).slice(0,5);
+  }
+
+  caption(txt, o) {
+    return o.display.replace(/inp.value/i, '<strong>' + inp.value + '</strong>');
+  }
+
+  open(e) {
+    let inp = e.target;
+
+    if (!inp.value) {
+      return false;
     }
 
-    dropDown.options.forEach(option => {
-      addOption(select, option.value, option.display);
-    });
+    return super.open(e);
   }
+}
 
-  createControl() {
-    let ctl = document.createElement('select');
-    ctl.size = this.dropSize;
-    this.addOptions(ctl, this.dropDown);
-    return ctl;
-  }
-
-  getControlValue(select) {
-    return select.options[select.selectedIndex].value;
+class DropDownColumn extends SelectColumn {
+  constructor(heading, binding, getter, setter, dropDown, editable, required) {
+    super(heading, binding, getter, setter, dropDown, editable, required);
   }
 
   getLength() {
     return Math.max(this.dropDown.length + 3.5, this.getHeaderLength());
-  }
-
-  setValue(ctl, value) {
-    ctl.value = value;
-    for (let i = 0; i < ctl.options.length; i++) {
-      if (ctl.options[i].value === value) {
-        ctl.selectedIndex = i;
-        return;
-      }
-    }
   }
 }
 
@@ -739,7 +747,7 @@ async function modal(elementName, title, contentUrl) {
     });
 
     window.addEventListener('click', (e) => {
-      if (event.target === modal) {
+      if (e.target === modal) {
         modal.style.display = 'none';
       }
     });

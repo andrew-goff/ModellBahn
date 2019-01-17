@@ -52,18 +52,6 @@ public class KupplungService extends AbstractItemService<NameKey, IKupplung> {
         super(IKupplung.class);
     }
 
-    @JsonCreator
-    public IKupplung create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IKupplung entity = new Kupplung(id, name, bezeichnung, deleted);
-        
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

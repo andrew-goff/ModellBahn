@@ -44,21 +44,6 @@ public class LandService extends AbstractItemService<NameKey, ILand> {
         super(ILand.class);
     }
 
-    @JsonCreator
-    public ILand create(@JsonProperty(value = ApiNames.ID) Long id,
-                    @JsonProperty(value = ApiPaths.NAME_PARAM_NAME) String name,
-                    @JsonProperty(value = ApiNames.WAHRUNG) String wahrungStr,
-                    @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-                    @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IWahrung wahrung = findWahrung(wahrungStr, false);
- 
-        ILand entity = new Land(id, name, bezeichnung, wahrung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

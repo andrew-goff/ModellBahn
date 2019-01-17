@@ -52,18 +52,6 @@ public class LichtService extends AbstractItemService<NameKey, ILicht> {
         super(ILicht.class);
     }
 
-    @JsonCreator
-    public ILicht create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiPaths.NAME_PARAM_NAME) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        ILicht entity = new Licht(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

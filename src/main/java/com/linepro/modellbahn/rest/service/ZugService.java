@@ -54,37 +54,6 @@ public class ZugService extends AbstractItemService<NameKey, IZug> {
         consistPersister = StaticPersisterFactory.get().createPersister(IZugConsist.class);
     }
 
-    @JsonCreator
-    public IZug create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.ZUG_TYP) String zugTypStr,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IZugTyp zugTyp = findZugTyp(zugTypStr, false);
-
-        IZug entity = new Zug(id, name, bezeichnung, zugTyp, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
-    @JsonCreator
-    public IZugConsist createZugConsist(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.ZUG) String zugStr,
-            @JsonProperty(value = ApiNames.POSITION) Integer position,
-            @JsonProperty(value = ApiNames.ARTIKEL) String artikelStr,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IZug zug = findZug(zugStr, true);
-        IArtikel artikel = findArtikel(artikelStr, false);
-        
-        IZugConsist entity = new ZugConsist(id,  zug, position, artikel, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

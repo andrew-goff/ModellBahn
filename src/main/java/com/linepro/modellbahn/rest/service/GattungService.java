@@ -43,18 +43,6 @@ public class GattungService extends AbstractItemService<NameKey, IGattung> {
         super(IGattung.class);
     }
 
-    @JsonCreator
-    public IGattung create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IGattung entity = new Gattung(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

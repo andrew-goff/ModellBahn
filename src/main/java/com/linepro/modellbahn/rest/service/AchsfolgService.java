@@ -43,18 +43,6 @@ public class AchsfolgService extends AbstractItemService<NameKey, IAchsfolg> {
         super(IAchsfolg.class);
     }
 
-    @JsonCreator
-    public IAchsfolg create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IAchsfolg entity = new Achsfolg(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

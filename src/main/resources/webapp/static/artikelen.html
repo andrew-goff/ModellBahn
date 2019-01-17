@@ -17,7 +17,7 @@
   const columns = [
     ARTIKEL_ID,
     PRODUKT,
-    new SelectColumn("Kategorie", "unterKategorie", (entity) => {
+    new DropDownColumn("Kategorie", "unterKategorie", (entity) => {
       return entity.produkt.unterKategorie ? extractKategorieValue(entity.produkt.unterKategorie)
           : undefined;
     }, (entity, value) => {

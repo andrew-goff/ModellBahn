@@ -61,29 +61,6 @@ public class KategorieService extends AbstractItemService<NameKey,  IKategorie> 
         unterKategoriePersister = StaticPersisterFactory.get().createPersister(IUnterKategorie.class);
     }
 
-    @JsonCreator
-    public IKategorie create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IKategorie entity = new Kategorie(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
-    @JsonCreator
-    public IUnterKategorie create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.KATEGORIE) String kategorieStr,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) throws Exception {
-        IKategorie kategorie = findKategorie(kategorieStr, false);
-
-        return new UnterKategorie(id, kategorie, name, bezeichnung, deleted);
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

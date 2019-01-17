@@ -45,20 +45,6 @@ public class HerstellerService extends AbstractItemService<NameKey, IHersteller>
         super(IHersteller.class);
     }
 
-    @JsonCreator
-    public IHersteller create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.TELEFON) String telefon,
-            @JsonProperty(value = ApiNames.URL) URL url,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IHersteller entity = new Hersteller(id, name, bezeichnung, url, telefon, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

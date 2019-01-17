@@ -60,61 +60,6 @@ public class VorbildService extends AbstractItemService<VorbildKey, IVorbild> {
         super(IVorbild.class);
     }
 
-    @JsonCreator
-    public IVorbild create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.GATTUNG) IGattung gattung,
-            @JsonProperty(value = ApiNames.UNTER_KATEGORIE, required=true) IUnterKategorie unterKategorie,
-            @JsonProperty(value = ApiNames.BAHNVERWALTUNG) IBahnverwaltung bahnverwaltung,
-            @JsonProperty(value = ApiNames.HERSTELLER) String hersteller,
-            @JsonProperty(value = ApiNames.BAUZEIT) LocalDate bauzeit,
-            @JsonProperty(value = ApiNames.ANZAHL) Integer anzahl,
-            @JsonProperty(value = ApiNames.BETREIBSNUMMER) String betreibsNummer,
-            @JsonProperty(value = ApiNames.ANTRIEB) IAntrieb antrieb,
-            @JsonProperty(value = ApiNames.ACHSFOLG) IAchsfolg achsfolg,
-            @JsonProperty(value = ApiNames.ANFAHRZUGKRAFT) BigDecimal anfahrzugkraft,
-            @JsonProperty(value = ApiNames.LEISTUNG) BigDecimal leistung,
-            @JsonProperty(value = ApiNames.DIENSTGEWICHT) BigDecimal dienstgewicht,
-            @JsonProperty(value = ApiNames.GESCHWINDIGKEIT) Integer geschwindigkeit,
-            @JsonProperty(value = ApiNames.LANGE) BigDecimal lange,
-            @JsonProperty(value = ApiNames.AUSSERDIENST) LocalDate ausserdienst,
-            @JsonProperty(value = ApiNames.DMTREIBRAD) BigDecimal dmTreibrad,
-            @JsonProperty(value = ApiNames.DMLAUFRADVORN) BigDecimal dmLaufradVorn,
-            @JsonProperty(value = ApiNames.DMLAUFRADHINTEN) BigDecimal dmLaufradHinten,
-            @JsonProperty(value = ApiNames.ZYLINDER) Integer zylinder,
-            @JsonProperty(value = ApiNames.DMZYLINDER) BigDecimal dmZylinder,
-            @JsonProperty(value = ApiNames.KOLBENHUB) BigDecimal kolbenhub,
-            @JsonProperty(value = ApiNames.KESSELUBERDRUCK) BigDecimal kesseluberdruck,
-            @JsonProperty(value = ApiNames.ROSTFLACHE) BigDecimal rostflache,
-            @JsonProperty(value = ApiNames.UBERHITZERFLACHE) BigDecimal uberhitzerflache,
-            @JsonProperty(value = ApiNames.WASSERVORRAT) BigDecimal wasservorrat,
-            @JsonProperty(value = ApiNames.VERDAMPFUNG) BigDecimal verdampfung,
-            @JsonProperty(value = ApiNames.FAHRMOTOREN) Integer fahrmotoren,
-            @JsonProperty(value = ApiNames.MOTORBAUART) String motorbauart,
-            @JsonProperty(value = ApiNames.LEISTUNGSUBERTRAGUNG) LeistungsUbertragung leistungsUbertragung,
-            @JsonProperty(value = ApiNames.REICHWEITE) BigDecimal reichweite,
-            @JsonProperty(value = ApiNames.KAPAZITAT) BigDecimal kapazitaet,
-            @JsonProperty(value = ApiNames.KLASSE) Integer klasse,
-            @JsonProperty(value = ApiNames.SITZPLATZEKL1) Integer sitzPlatzeKL1,
-            @JsonProperty(value = ApiNames.SITZPLATZEKL2) Integer sitzPlatzeKL2,
-            @JsonProperty(value = ApiNames.SITZPLATZEKL3) Integer sitzPlatzeKL3,
-            @JsonProperty(value = ApiNames.SITZPLATZEKL4) Integer sitzPlatzeKL4,
-            @JsonProperty(value = ApiNames.AUFBAU) String aufbauten,
-            @JsonProperty(value = ApiNames.TRIEBKOPF) Integer triebkopf,
-            @JsonProperty(value = ApiNames.MITTELWAGEN) Integer mittelwagen,
-            @JsonProperty(value = ApiNames.DREHGESTELLBAUART) String drehgestellbauart,
-            @JsonProperty(value = ApiNames.ANMERKUNG) String anmerkung,
-            @JsonProperty(value = ApiNames.ABBILDUNG) String abbildungStr,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IVorbild entity = new Vorbild(id, gattung, unterKategorie, bahnverwaltung, hersteller, bauzeit, anzahl, betreibsNummer, antrieb, achsfolg, anmerkung, anfahrzugkraft, leistung, dienstgewicht,
-                geschwindigkeit, lange, ausserdienst, dmTreibrad, dmLaufradVorn, dmLaufradHinten, zylinder, dmZylinder, kolbenhub, kesseluberdruck, rostflache, uberhitzerflache,
-                wasservorrat, verdampfung, fahrmotoren, anmerkung, leistungsUbertragung, reichweite, kapazitaet, klasse, sitzPlatzeKL1, sitzPlatzeKL2, sitzPlatzeKL3,
-                sitzPlatzeKL4, aufbauten, triebkopf, mittelwagen, drehgestellbauart, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

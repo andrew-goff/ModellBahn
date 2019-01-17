@@ -43,18 +43,6 @@ public class ProtokollService extends AbstractItemService<NameKey, IProtokoll> {
         super(IProtokoll.class);
     }
 
-    @JsonCreator
-    public IProtokoll create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IProtokoll entity = new Protokoll(id, name, bezeichnung, deleted);
-
-        debug("created: " + entity);
-
-        return entity;
-    }
-
     @GET
     @Path(ApiPaths.NAME_PART)
     @Produces(MediaType.APPLICATION_JSON)

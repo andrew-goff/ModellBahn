@@ -1,84 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
-<!--
-Log4j configuration for ModellBahn project 
-$Author$
-$Id$
--->
-	<Appenders>
-		<!-- Console Appender -->
-		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss.SSS a} [%t] %-5level %logger{36} - %msg%n" />
-		</Console>
+  <!--
+  Log4j configuration for ModellBahn project
+  $Author$
+  $Id$
+  -->
+  <Appenders>
+    <!-- Console Appender -->
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss.SSS a} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
 
-		<!-- File Appender -->
-		<File name="File" fileName="./ModellBahn.log">
-			<PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss.SSS a} [%t] %-5level %logger{36} - %msg%n" />
-		</File>
-	</Appenders>
+    <!-- File Appender -->
+    <File name="File" fileName="./ModellBahn.log">
+      <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss.SSS a} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+  </Appenders>
 
-	<Loggers>
-		<!-- Log everything in hibernate -->
-		<Logger name="org.hibernate" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-		</Logger>
+  <Loggers>
+    <!-- Log everything in hibernate -->
+    <Logger name="org.hibernate" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
 
-		<!-- Log SQL statements -->
-		<Logger name="org.hibernate.SQL" level="debug" additivity="false">
-			<AppenderRef ref="File" />
-		</Logger>
+    <!-- Log SQL statements -->
+    <Logger name="org.hibernate.SQL" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
 
-		<!-- Log JDBC bind parameters -->
-		<Logger name="org.hibernate.type.descriptor.sql" level="debug" additivity="false">
-			<AppenderRef ref="File" />
-		</Logger>
+    <!-- Log JDBC bind parameters -->
+    <Logger name="org.hibernate.type.descriptor.sql" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
 
-        <!-- Hibernate logs the state at flush time of max. 20 entities to this log category. -->
-        <Logger name="org.hibernate.pretty" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-           
-        <!-- Information about second level cache activities is written to this log category. -->
-        <Logger name="org.hibernate.cache" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-         
-        <!-- Hibernate writes some statistics for each query to this category. The statistics need to be activated separately (see Activate Hibernate Statistics). -->
-        <Logger name="org.hibernate.stat" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-        
-        <!-- This category groups the HQL and SQL ASTs during query parsing. -->
-        <Logger name="org.hibernate.hql.internal.ast.AST" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-        
-        <!-- Hibernate writes the DDL SQL queries executed during schema migration to this log category. -->
-        <Logger name="org.hibernate.tool.hbm2ddl" level="debug" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-        
-		<!-- Log custom packages -->
-		<Logger name="com.linepro.modellbahn" level="info" additivity="false">
-			<AppenderRef ref="Console" />
-            <AppenderRef ref="File" />
-		</Logger>
-		
-        <Logger name="org.apache" level="info" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
+    <!-- Hibernate logs the state at flush time of max. 20 entities to this log category. -->
+    <Logger name="org.hibernate.pretty" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
 
-        <Logger name="org.apache.commons.beanutils.converters.BooleanConverter" level="info" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
-        
-        <Logger name="org.glassfish.grizzly" level="info" additivity="false">
-            <AppenderRef ref="File" />
-        </Logger>
+    <!-- Information about second level cache activities is written to this log category. -->
+    <Logger name="org.hibernate.cache" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
 
-		<Root level="error">
-            <AppenderRef ref="Console" />
-            <AppenderRef ref="File" />
-		</Root>
-	</Loggers>
+    <!-- Hibernate writes some statistics for each query to this category. The statistics need to be activated separately (see Activate Hibernate Statistics). -->
+    <Logger name="org.hibernate.stat" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <!-- This category groups the HQL and SQL ASTs during query parsing. -->
+    <Logger name="org.hibernate.hql.internal.ast.AST" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <!-- Hibernate writes the DDL SQL queries executed during schema migration to this log category. -->
+    <Logger name="org.hibernate.tool.hbm2ddl" level="debug" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <!-- Log custom packages -->
+    <Logger name="com.linepro.modellbahn" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <Logger name="org.apache" level="info" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <Logger name="org.apache.commons.beanutils.converters.BooleanConverter" level="info"
+      additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <Logger name="org.glassfish.grizzly" level="info" additivity="false">
+      <AppenderRef ref="File"/>
+    </Logger>
+
+    <Root level="error">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </Root>
+  </Loggers>
 </Configuration>

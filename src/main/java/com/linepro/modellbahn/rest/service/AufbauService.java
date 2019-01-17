@@ -1,5 +1,8 @@
 package com.linepro.modellbahn.rest.service;
 
+import static com.fasterxml.jackson.annotation.JsonCreator.Mode.DELEGATING;
+import static com.fasterxml.jackson.annotation.JsonCreator.Mode.PROPERTIES;
+
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -54,14 +57,23 @@ public class AufbauService extends AbstractItemService<NameKey, IAufbau> {
         super(IAufbau.class);
     }
 
-    @JsonCreator
-    public IAufbau create(@JsonProperty(value = ApiNames.ID) Long id,
-            @JsonProperty(value = ApiNames.NAMEN) String name,
-            @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
-            @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
-        IAufbau entity = new Aufbau(id, name, bezeichnung, deleted);
+    @JsonCreator(mode=DELEGATING)
+    public static Aufbau createAufbauNoArgs() {
+        Aufbau entity = new Aufbau();
 
-        debug("created: " + entity);
+        //debug(entity);
+
+        return entity;
+    }
+
+    @JsonCreator(mode=PROPERTIES)
+    public static Aufbau createAufbau(@JsonProperty(value = ApiNames.ID) Long id,
+        @JsonProperty(value = ApiNames.NAMEN) String name,
+        @JsonProperty(value = ApiNames.BEZEICHNUNG) String bezeichnung,
+        @JsonProperty(value = ApiNames.DELETED) Boolean deleted) {
+        Aufbau entity = new Aufbau(id, name, bezeichnung, deleted);
+
+        //debug(entity);
 
         return entity;
     }
@@ -96,7 +108,7 @@ public class AufbauService extends AbstractItemService<NameKey, IAufbau> {
     @Produces(MediaType.APPLICATION_JSON)
     @JsonView(Views.Public.class)
     @ApiOperation(code = 201, value = "Adds an Aufbau", response = IAufbau.class)
-    public Response add(IAufbau entity) {
+    public Response add(Aufbau entity) {
         return super.add(entity);
     }
 
@@ -106,7 +118,7 @@ public class AufbauService extends AbstractItemService<NameKey, IAufbau> {
     @Produces(MediaType.APPLICATION_JSON)
     @JsonView(Views.Public.class)
     @ApiOperation(code = 202, value = "Updates an Aufbau by name", response = IAufbau.class)
-    public Response update(@PathParam(ApiPaths.NAME_PARAM_NAME) String name, IAufbau entity) {
+    public Response update(@PathParam(ApiPaths.NAME_PARAM_NAME) String name, Aufbau entity) {
         return super.update(name, entity);
     }
 
