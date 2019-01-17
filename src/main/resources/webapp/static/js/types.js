@@ -77,7 +77,7 @@ const FUNKTION = new TextColumn('Funktion', 'funktion', (entity) => { return ent
 const GATTUNG = new SelectColumn('Gattung', 'gattung', (entity) => { return entity.gattung ? entity.gattung.name : undefined; }, (entity, value) => { entity.gattung = value; }, GATTUNG_DROP, Editable.UPDATE, false);
 const GERAUSCH = new BoolColumn('Geräusch', 'gerausch', (entity) => { return entity.sound; }, (entity, value) => { entity.sound = value; }, Editable.UPDATE, true);
 const GESCHWINDIGKEIT = new NumberColumn('Geschwindigkeit', 'geschwindigkeit', (entity) => { return entity.geschwindigkeit; }, (entity, value) => { entity.geschwindigkeit = value; }, Editable.UPDATE, false, 300, 1);
-const HERSTELLER = new AutoCompleteColumn('Hersteller', 'hersteller', (entity) => { return entity.hersteller ? entity.hersteller.name : undefined.name; }, (entity, value) => { entity.hersteller = value; }, HERSTELLER_DROP, Editable.ADD, true);
+const HERSTELLER = new AutoCompleteColumn('Hersteller', 'hersteller', (entity) => { return entity.hersteller ? entity.hersteller.name : undefined.name; }, (entity, value) => { entity.hersteller = value; }, HERSTELLER_DROP, Editable.UPDATE, true);
 const I_MAX = new NumberColumn('I Max', 'iMax', (entity) => { return entity.iMax; }, (entity, value) => { entity.iMax = value; }, Editable.UPDATE, false, 1000, 1);
 const INDEX = new NumberColumn('Index', 'index', (entity) => { return entity.index; }, (entity, value) => { entity.index = value; }, Editable.ADD, true, 3, 0);
 const KAPAZITAT = new NumberColumn('Kapazität', 'kapazitat', (entity) => { return entity.kapazitat; }, (entity, value) => { entity.kapazitat = value; }, Editable.UPDATE, false, 3000, 1, 2);

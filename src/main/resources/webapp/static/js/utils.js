@@ -13,6 +13,10 @@ const EditMode = {
   ADD: 2
 };
 
+const DATE_PATTERN = '^(18[2-9][0-9]|19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$';
+
+const URL_PATTERN = '^(?:(http[s]?):\\/\\/)?(\\w+(?:\\.\\w+)*)(?::(\\d+))?(?:\\/(\\w+(?:\\/|\\.\\w+)?))?$';
+
 const shouldDisable = (editable, editMode) => {
   if (editable === Editable.NEVER || editMode === EditMode.VIEW) {
     return true;
@@ -152,6 +156,14 @@ const selectFile = (ctl, type, filter) => {
   //TODO: popup selector
 };
 
+const valueAndUnits = (cssSize) => {
+  let dims = /^(\d+)([^\d]+)$/.exec(cssSize);
+  return {
+    value: dims[1],
+    units: dims[2]
+  };
+};
+
 class Column {
   constructor(heading, binding, getter, setter, editable, required, length) {
     this.heading = heading;
@@ -160,8 +172,7 @@ class Column {
     this.setter = setter;
     this.editable = editable ? editable : Editable.NEVER;
     this.required = required ? required : false;
-    this.length = Math.max(length ? length : heading.length,
-        heading.length + 1);
+    this.length = Math.max(length ? length : heading.length, heading.length + 1);
     this.width = 0;
   }
 
@@ -322,21 +333,19 @@ class TextColumn extends Column {
 
 class URLColumn extends Column {
   constructor(heading, binding, getter, setter, editable, required) {
-    super(heading, binding, getter, setter, editable, required);
+    super(heading, binding, getter, setter, editable, required, URL_PATTERN);
   }
 
   createControl() {
     let ctl = super.createControl();
     ctl.type = 'url';
-    ctl.pattern = '^(?:(http[s]?):\\/\\/)?(\\w+(?:\\.\\w+)*)(?::(\\d+))?(?:\\/(\\w+(?:\\/|\\.\\w+)?))?$';
     return ctl;
   }
 }
 
 class DateColumn extends TextColumn {
   constructor(heading, binding, getter, setter, editable, required) {
-    super(heading, binding, getter, setter, editable, required, 12,
-        '^(18[2-9][0-9]|19[0-9]{2}|2[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$');
+    super(heading, binding, getter, setter, editable, required, 12, DATE_PATTERN);
   }
 
   createControl() {
@@ -358,7 +367,7 @@ class IMGColumn extends Column {
     let div = document.createElement('div');
 
     let ctl = getImg('none');
-    ctl.className = 'img-';
+    //ctl.className = 'img-';
     ctl.addEventListener('click', (e) => {
     });
     if (this.onChange) {
@@ -441,18 +450,18 @@ class AutoCompleteColumn extends Column {
     if (!ctl.disabled) {
       ctl.addEventListener('input', (e) => { this.input(e); });
       ctl.addEventListener('keydown', (e) => { this.keydown(e); });
-      cell.classList.add('autocomplete');
+      ctl.classList.add('autocomplete');
     }
   
     return ctl;
   }
 
   getControlValue(ctl) {
-    return ctl.code;
+    return ctl.getAttribute('data-name');
   }
 
   setValue(ctl, value) {
-    ctl.code = value;    
+    ctl.setAttribute('data-name', value);
     this.dropDown.options.forEach((o) => {
       if (o.value === value) {
         ctl.value = o.display;
@@ -465,30 +474,32 @@ class AutoCompleteColumn extends Column {
   }
 
   input(e) {
-	let ctl = this;
+    let ctl = this;
     let inp = e.target;
+    let div = inp.parentNode;
 
-    closeAutoLists(inp.parentNode);
+    closeAutoLists(div);
 
     if (!inp.value) {
       return false;
     }
 
-    let rect = inp.parentNode.getBoundingClientRect();
+    let rect = div.getBoundingClientRect();
 
     let autoComp = document.createElement('div');
     autoComp.className = 'autocomplete-list';
     autoComp.style.top = rect.y + rect.height;
-    inp.parentNode.appendChild(autoComp);
+    div.appendChild(autoComp);
+    let dims = valueAndUnits(getComputedStyle(autoComp).lineHeight);
 
     let i = 0;
     ctl.dropDown.options.forEach((o) => {
       if (i < 5 && o.display.toLowerCase().includes(inp.value.toLowerCase())) {
    	    let autoItem = document.createElement('div');
-        autoItem.code = o.value;
+        autoItem.setAttribute('data-name', o.value);
    	    autoItem.className = 'autocomplete-items';
-   	    autoItem.style.top = (2*i)+'rem';
-        let txt = addText(autoItem, o.display.replace('/inp.value/i', '<strong>' + inp.value + '</strong>'));
+        autoItem.style.top = (dims.value*i)+dims.units;
+        let txt = addText(autoItem, o.display.replace(/inp.value/i, '<strong>' + inp.value + '</strong>'));
         autoItem.addEventListener('click', (e) => { this.click(e); });
         autoComp.appendChild(autoItem);
         i++;
@@ -497,48 +508,54 @@ class AutoCompleteColumn extends Column {
   }
 
   click(e) {
-	let o = e.target;
-    let inp = o.parentNode;
+	  let opt = e.target;
+    let autoComp = opt.parentNode;
+    let div = autoComp.parentNode;
+    let inp = div.getElementsByClassName('autocomplete')[0];
 
-    inp.value = e.target.value;
-    inp.code = e.target.code;
+    inp.value = opt.innerText;
+    inp.setAttribute('data-name', opt.getAttribute('data-name'));
 
-    closeAutoLists(inp.parentNode);
+    closeAutoLists(div);
   };
   
   keydown(e) {
-    ctl = this;
-    inp = e.target.parentNode;
+    let ctl = this;
+    let div = e.target.parentNode;
 
-    let autoComps = inp.getElementsByClassName('autocomplete-list');
+    let autoComps = div.getElementsByClassName('autocomplete-list');
 
     if (!autoComps || !autoComps.length) return;
     
     let autoComp = autoComps[0];
 
     if (e.keyCode == 40) {
-      ctl.addActive(inp, autoComp);
+      ctl.addActive(ctl, autoComp, true);
     } else if (e.keyCode == 38) {
-       ctl.addActive(inp, autoComp);
+       ctl.addActive(ctl, autoComp, false);
     } else if (e.keyCode == 13) {
        e.preventDefault();
-//       if (currentFocus > -1) {
-//         if (inp) inp[currentFocus].click();
-//       }
+       ctl.selectActive(autoComp);
     }
   }
 
-  addActive(inp, autoComp) {
-    if (!inp || !autoComp) return false;
+  addActive(ctl, autoComp, up) {
+    let items = autoComp.getElementsByClassName('autocomplete-items');
+    let curr = -1;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].classList.contains('autocomplete-active')) {
+        if (curr == -1) curr = i;
+        items[i].classList.remove('autocomplete-active');
+      }
+    }
 
-    removeActive(inp, autoComp);
+    let next = curr + (up ? 1 : -1);
+    if (0 <= next && next <= items.length) items[next].classList.add('autocomplete-active');
   }
   
-  removeActive (inp, autoComp) {
+  selectActive(autoComp) {
     let active = autoComp.getElementsByClassName('autocomplete-active');
-    for (var i = 0; i < active.length; i++) {
-      active[i].classList.remove('autocomplete-active');
-    }
+    if (active.length) active[0].click();
   }
 }
 
