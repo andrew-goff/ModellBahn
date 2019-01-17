@@ -197,7 +197,9 @@ class Column {
   }
 
   createControl() {
-    return document.createElement('input');
+    let ctl = document.createElement('input');
+    ctl.autocomplete = 'off';
+    return ctl;
   }
 
   getControl(cell, entity, editMode) {
@@ -216,8 +218,7 @@ class Column {
     if (value || entity) {
       ctl.disabled = shouldDisable(this.editable, editMode);
     } else {
-      ctl.disabled = !(editMode === EditMode.ADD && this.editable
-          !== Editable.NEVER);
+      ctl.disabled = !(editMode === EditMode.ADD && this.editable !== Editable.NEVER);
     }
 
     ctl.readOnly = ctl.disabled;
@@ -389,31 +390,6 @@ class PDFColumn extends Column {
     this.onChange = onChange;
   }
 
-  getControl(cell, entity, editMode) {
-    let ctl = this.createControl();
-
-    let value;
-
-    if (entity) {
-      value = this.entityValue(entity);
-    }
-
-    if (value) {
-      this.setValue(ctl, value);
-    }
-
-    if (value || entity) {
-      ctl.disabled = shouldDisable(this.editable, editMode);
-    } else {
-      ctl.disabled = !(editMode === EditMode.ADD && this.editable
-          !== Editable.NEVER);
-    }
-
-    ctl.required = this.required;
-
-    return ctl;
-  }
-
   createControl() {
     let ctl = document.createElement('a');
     ctl.addEventListener('click', (e) => {
@@ -445,26 +421,29 @@ class PDFColumn extends Column {
 }
 
 const closeAutoLists = (elmnt) => {
-  let autoComp = document.getElementsByClassName('autocomplete-list');
+  let autoComp = elmnt.getElementsByClassName('autocomplete-list');
   for (let i = 0 ; i < autoComp.length; i++) {
-    autoComp[i].parent.removeChild(autoComp[i]);
+    autoComp[i].parentNode.removeChild(autoComp[i]);
   }
 };
 
 class AutoCompleteColumn extends Column {
   constructor(heading, binding, getter, setter, dropDown, editable, required) {
     super(heading, binding, getter, setter, editable, required, dropDown.length);
-    this.options = dropDown.options;
+    this.dropDown = dropDown;
 
-    document.addEventListener('click', this.closeAllLists);
+    document.addEventListener('click', closeAutoLists(document));
   }
 
   getControl(cell, entity, editMode) {
-    let ctl = super.createControl();
-    ctl.type = 'text';
-    ctl.maxLength = this.length;
-    ctl.addEventListener('input', (e) => { this.input(e); });
-    ctl.addEventListener('keydown', (e) => { this.keydown(e); }); 
+    let ctl = super.getControl(cell, entity, editMode);
+    
+    if (!ctl.disabled) {
+      ctl.addEventListener('input', (e) => { this.input(e); });
+      ctl.addEventListener('keydown', (e) => { this.keydown(e); });
+      cell.classList.add('autocomplete');
+    }
+  
     return ctl;
   }
 
@@ -474,88 +453,93 @@ class AutoCompleteColumn extends Column {
 
   setValue(ctl, value) {
     ctl.code = value;    
-    ctl.options.forEach((o) => {
+    this.dropDown.options.forEach((o) => {
       if (o.value === value) {
         ctl.value = o.display;
       }
     });
   }
 
+  getLength() {
+    return Math.max(this.dropDown.length, this.getHeaderLength());
+  }
+
   input(e) {
 	let ctl = this;
     let inp = e.target;
 
-    closeAutoLists(inp);
+    closeAutoLists(inp.parentNode);
 
     if (!inp.value) {
       return false;
     }
 
+    let rect = inp.parentNode.getBoundingClientRect();
+
     let autoComp = document.createElement('div');
     autoComp.className = 'autocomplete-list';
+    autoComp.style.top = rect.y + rect.height;
+    inp.parentNode.appendChild(autoComp);
 
-    inp.appendChild(autoComp);
-
-    ctl.options.forEach((o) => {
-      if (o.display.toLowerCase().includes(inp.value.toLowerCase())) {
+    let i = 0;
+    ctl.dropDown.options.forEach((o) => {
+      if (i < 5 && o.display.toLowerCase().includes(inp.value.toLowerCase())) {
    	    let autoItem = document.createElement('div');
         autoItem.code = o.value;
    	    autoItem.className = 'autocomplete-items';
+   	    autoItem.style.top = (2*i)+'rem';
         let txt = addText(autoItem, o.display.replace('/inp.value/i', '<strong>' + inp.value + '</strong>'));
-        autoItem.addEventListener('click', this.click);
+        autoItem.addEventListener('click', (e) => { this.click(e); });
         autoComp.appendChild(autoItem);
+        i++;
       }
     });
   }
 
   click(e) {
 	let o = e.target;
-    let inp = o.parent;
+    let inp = o.parentNode;
 
     inp.value = e.target.value;
     inp.code = e.target.code;
 
-    closeAutoLists(inp);
+    closeAutoLists(inp.parentNode);
   };
   
-  /*
-  keydown = (e) => {
+  keydown(e) {
     ctl = this;
-    inp = e.target;
+    inp = e.target.parentNode;
 
-    if (inp) x = x.getElementsByTagName('div');
+    let autoComps = inp.getElementsByClassName('autocomplete-list');
+
+    if (!autoComps || !autoComps.length) return;
+    
+    let autoComp = autoComps[0];
 
     if (e.keyCode == 40) {
-      currentFocus++;
-      ctl.addActive(inp);
-     } else if (e.keyCode == 38) {
-       currentFocus--;
-       ctl.addActive(inp);
-     } else if (e.keyCode == 13) {
+      ctl.addActive(inp, autoComp);
+    } else if (e.keyCode == 38) {
+       ctl.addActive(inp, autoComp);
+    } else if (e.keyCode == 13) {
        e.preventDefault();
-       if (currentFocus > -1) {
-         if (inp) inp[currentFocus].click();
-       }
-     }
-  };
-
-  addActive = (inp) => {
-    if (!inp) return false;
-
-    removeActive(inp);
-      
-    if (currentFocus >= inp.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (inp.length - 1);
-
-    inp[currentFocus].classList.add('autocomplete-active');
-  }
-  
-  removeActive = (inp) => {
-    for (var i = 0; i < inp.length; i++) {
-      inp[i].classList.remove('autocomplete-active');
+//       if (currentFocus > -1) {
+//         if (inp) inp[currentFocus].click();
+//       }
     }
   }
-  */
+
+  addActive(inp, autoComp) {
+    if (!inp || !autoComp) return false;
+
+    removeActive(inp, autoComp);
+  }
+  
+  removeActive (inp, autoComp) {
+    let active = autoComp.getElementsByClassName('autocomplete-active');
+    for (var i = 0; i < active.length; i++) {
+      active[i].classList.remove('autocomplete-active');
+    }
+  }
 }
 
 class SelectColumn extends Column {
@@ -564,31 +548,6 @@ class SelectColumn extends Column {
         dropDown.length + 3.5);
     this.dropDown = dropDown;
     this.dropSize = 1;
-  }
-
-  getControl(cell, entity, editMode) {
-    let ctl = this.createControl();
-
-    let value;
-
-    if (entity) {
-      value = this.entityValue(entity);
-    }
-
-    if (value) {
-      this.setValue(ctl, value);
-    }
-
-    if (value || entity) {
-      ctl.disabled = shouldDisable(this.editable, editMode);
-    } else {
-      ctl.disabled = !(editMode === EditMode.ADD && this.editable
-          !== Editable.NEVER);
-    }
-
-    ctl.required = this.required;
-
-    return ctl;
   }
 
   addOptions(select, dropDown) {

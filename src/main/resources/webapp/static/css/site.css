@@ -572,7 +572,7 @@ ul.footer li:last-of-type {
 
 .modal-footer {
   background-color: LightSkyBlue;
-  color: white;
+  color: White;
   height: 2rem;
   width: 100%;
 }
@@ -677,3 +677,40 @@ button.selection {
   vertical-align: top;
 }
 
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-list {
+  background-color: white;
+  display: block;
+  line-height: 2rem;
+  padding-left: 0.6rem;
+  position: relative;
+}
+
+.autocomplete-items {
+  background-color: white;
+  border: 1px solid LightSkyBlue;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 99;
+}
+
+.autocomplete-items div {
+  background-color: LightYellow; 
+  cursor: pointer;
+  padding: 10px;
+}
+
+.autocomplete-items div:hover {
+  background-color: LemonChiffon; 
+}
+
+.autocomplete-active {
+  background-color: LemonChiffon; 
+  color: White; 
+} 
